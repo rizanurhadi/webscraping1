@@ -29,19 +29,19 @@ class ForlapbotSpider(scrapy.Spider):
         kode_pengaman.send_keys(str(hit3))
         mybtn = self.driver.find_element_by_xpath('//input[@type="button"]')
         mybtn.click()
-        time.sleep(10)
+        time.sleep(30)
         #yield {'test':str(hit3)}
-        #rows = self.driver.find_elements_by_class_name("ttop")
-        #for row in rows:
-        #    data = row.find_elements_by_tag_name('td')
-        #    yield {
-        #     'kode': data[1].text,
-        #     'nama': data[2].text
-        #    }
+        rows = self.driver.find_elements_by_class_name("ttop")
+        #item = BasicItem()
+        for row in rows:
+            data = row.find_elements_by_tag_name('td')
+            link_detail = row.find_element_by_xpath('//td/a')
+            yield self.make_yeld(data,link_detail)
         #myactive = self.driver.find_elements_by_css_selector('li.active > span')
         #myactive = self.driver.find_element_by_xpath('//li[@class="active"]/following-sibling::li/a')
         #myli = myul.find_elements_by_tag_name('li')
         #yield {'test':myactive.get_attribute("href")}
+        #iteartor = 1
         while True:
             mylia = self.driver.find_element_by_xpath('//li[@class="active"]/following-sibling::li/a')
             try:
@@ -51,14 +51,12 @@ class ForlapbotSpider(scrapy.Spider):
                 rows2 = self.driver.find_elements_by_class_name("ttop")
                 for row1 in rows2:
                     data1 = row1.find_elements_by_tag_name('td')
-                    yield {
-                     'kode': data1[1].text,
-                     'nama': data1[2].text
-                    }
+                    link_detail2 = row1.find_element_by_xpath('//td/a')
+                    yield self.make_yeld(data1,link_detail2)
             except:
+                time.sleep(2)
+                self.driver.quit()
                 break
-        time.sleep(2)
-        self.driver.close()
         #yield {'test':plans}
         #self.driver.find_element_by_xpath('//input[@name = "kode_pengaman"]').attrib['value'] = str(hit3)
         #inputbtn = self.driver.find_element_by_xpath('//input[@class = "btn btn-primary"]')
@@ -78,3 +76,19 @@ class ForlapbotSpider(scrapy.Spider):
         #     }
     def after_login(self, response):
         yield {'body':response.css('html').extract()}
+    
+    def make_yeld(self, data,link_detail):
+        return {
+             'kode': data[1].text,
+             'nama': data[2].text,
+             'link_detail' : link_detail.get_attribute("href"),
+             'prov': data[3].text,
+             'kategori': data[4].text,
+             'Status': data[5].text,
+             'jml_dosen_tetap_1718': data[6].text,
+             'jml_mhs_1718': data[7].text,
+             'rasio_dosen_mhs_1718': data[8].text,
+             'jml_dosen_tetap_1819': data[9].text,
+             'jml_mhs_1819': data[10].text,
+             "rasio_dosen_mhs_1819": data[11].text
+            }
