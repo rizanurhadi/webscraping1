@@ -2,6 +2,7 @@
 import scrapy
 import time
 from selenium import webdriver
+from scrapy.selector import Selector
 
 
 
@@ -10,7 +11,7 @@ class ForlapbotSpider(scrapy.Spider):
     allowed_domains = ['forlap.ristekdikti.go.id']
     start_urls = ['https://forlap.ristekdikti.go.id/perguruantinggi/']
     #handle_httpstatus_list = [302]
-
+    
     def __init__(self):
         self.driver = webdriver.Chrome(executable_path='D:/scrapy_script/chromedriver_win32/chromedriver.exe')
 
@@ -29,34 +30,54 @@ class ForlapbotSpider(scrapy.Spider):
         kode_pengaman.send_keys(str(hit3))
         mybtn = self.driver.find_element_by_xpath('//input[@type="button"]')
         mybtn.click()
-        time.sleep(30)
+        time.sleep(10)
         #yield {'test':str(hit3)}
-        rows = self.driver.find_elements_by_class_name("ttop")
+        #begin get detail
+        scrapy_selector = Selector(text = self.driver.page_source)
+        for row in scrapy_selector.css('tr.ttop'):
+            data = row.css('td')
+            kodept =data[1].css('::text').get()
+            yield response.follow(data[2].css('a::attr(href)').get(), self.parse_detail, meta={'kodept': kodept})
+        #mylinkpage = scrapy_selector.xpath('//li[@class="active"]/following-sibling::li/a/@href').get()
+        #yield response.follow(mylinkpage, self.parse_page)
+        mylia = self.driver.find_element_by_xpath('//li[@class="active"]/following-sibling::li/a')
+        mylia.click()
+        time.sleep(10)
+            
+            
+            #go paging
+        #End get Detail
+        #rows = self.driver.find_elements_by_class_name("ttop")
         #item = BasicItem()
-        for row in rows:
-            data = row.find_elements_by_tag_name('td')
-            link_detail = row.find_element_by_xpath('//td/a')
-            yield self.make_yeld(data,link_detail)
+        #for row in rows:
+           #data = row.find_elements_by_tag_name('td')
+            #link_detail = row.find_element_by_xpath('//td/a')
+            #yield scrapy.Request(link_detail.get_attribute("href"), callback=self.parse_detail)
+            #yield self.make_yeld(data,link_detail)
         #myactive = self.driver.find_elements_by_css_selector('li.active > span')
         #myactive = self.driver.find_element_by_xpath('//li[@class="active"]/following-sibling::li/a')
         #myli = myul.find_elements_by_tag_name('li')
         #yield {'test':myactive.get_attribute("href")}
         #iteartor = 1
-        while True:
-            mylia = self.driver.find_element_by_xpath('//li[@class="active"]/following-sibling::li/a')
-            try:
-                mylia.click()
-                time.sleep(10)
-                # get the data and write it to scrapy items
-                rows2 = self.driver.find_elements_by_class_name("ttop")
-                for row1 in rows2:
-                    data1 = row1.find_elements_by_tag_name('td')
-                    link_detail2 = row1.find_element_by_xpath('//td/a')
-                    yield self.make_yeld(data1,link_detail2)
-            except:
-                time.sleep(2)
-                self.driver.quit()
-                break
+        #if self.driver.find_elements_by_xpath('//li[@class="active"]/following-sibling::li/a') :
+        #    pass
+        gotroughpage = False
+        if gotroughpage == True :
+            while True:
+                mylia = self.driver.find_element_by_xpath('//li[@class="active"]/following-sibling::li/a')
+                try:
+                    mylia.click()
+                    time.sleep(10)
+                    # get the data and write it to scrapy items
+                    rows2 = self.driver.find_elements_by_class_name("ttop")
+                    for row1 in rows2:
+                        data1 = row1.find_elements_by_tag_name('td')
+                        link_detail2 = row1.find_element_by_xpath('//td/a')
+                        yield self.make_yeld(data1,link_detail2)
+                except:
+                    break
+        time.sleep(2)
+        self.driver.quit()
         #yield {'test':plans}
         #self.driver.find_element_by_xpath('//input[@name = "kode_pengaman"]').attrib['value'] = str(hit3)
         #inputbtn = self.driver.find_element_by_xpath('//input[@class = "btn btn-primary"]')
@@ -92,3 +113,25 @@ class ForlapbotSpider(scrapy.Spider):
              'jml_mhs_1819': data[10].text,
              "rasio_dosen_mhs_1819": data[11].text
             }
+    def parse_detail(self, response) :
+        mytable = response.xpath('//table[@class="table table-bordered"]') 
+        i = 0
+        for alltr in mytable[1].css('tr') : 
+            i += 1
+            if i > 2 :
+                yield { 
+                    'kodept':response.meta.get('kodept'),
+                    'kode' : alltr.xpath('td[2]//text()').get() ,
+                    'nama' : alltr.xpath('td[3]//text()').get() 
+                    }
+            #yield { 'nama': alltr.css('td[2]::text').extract() }
+        #for alltr in  mytable.css('tr') :
+        #    yield { 
+        #        'kode': alltr.css('td[1]::text').extract(), 
+        #        'nama': alltr.css('td[2]::text').extract()
+        #         }
+    def parse_page(self,response):
+        for row in response.css('tr.ttop'):
+          data = row.css('td')
+          kodept =data[1].css('::text').get()
+          yield response.follow(data[2].css('a::attr(href)').get(), self.parse_detail, meta={'kodept': kodept})
