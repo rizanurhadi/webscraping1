@@ -33,6 +33,7 @@ class ForlapbotSpider(scrapy.Spider):
         time.sleep(10)
         #yield {'test':str(hit3)}
         #begin get detail
+        """
         scrapy_selector = Selector(text = self.driver.page_source)
         for row in scrapy_selector.css('tr.ttop'):
             data = row.css('td')
@@ -46,13 +47,15 @@ class ForlapbotSpider(scrapy.Spider):
             
             
             #go paging
+        """
         #End get Detail
-        #rows = self.driver.find_elements_by_class_name("ttop")
+        rows = self.driver.find_elements_by_class_name("ttop")
         #item = BasicItem()
-        #for row in rows:
-           #data = row.find_elements_by_tag_name('td')
-            #link_detail = row.find_element_by_xpath('//td/a')
-            #yield scrapy.Request(link_detail.get_attribute("href"), callback=self.parse_detail)
+        for row in rows:
+           data = row.find_element_by_tag_name('a')
+           #link_detail = row.find_element_by_xpath('//td/a')
+           yield { 'linksdetail':data.get_attribute("href") }
+           #yield scrapy.Request(link_detail.get_attribute("href"), callback=self.parse_detail)
             #yield self.make_yeld(data,link_detail)
         #myactive = self.driver.find_elements_by_css_selector('li.active > span')
         #myactive = self.driver.find_element_by_xpath('//li[@class="active"]/following-sibling::li/a')
@@ -61,19 +64,20 @@ class ForlapbotSpider(scrapy.Spider):
         #iteartor = 1
         #if self.driver.find_elements_by_xpath('//li[@class="active"]/following-sibling::li/a') :
         #    pass
-        gotroughpage = False
+        gotroughpage = True
         if gotroughpage == True :
             while True:
                 mylia = self.driver.find_element_by_xpath('//li[@class="active"]/following-sibling::li/a')
                 try:
                     mylia.click()
-                    time.sleep(10)
+                    time.sleep(2.5)
                     # get the data and write it to scrapy items
                     rows2 = self.driver.find_elements_by_class_name("ttop")
                     for row1 in rows2:
-                        data1 = row1.find_elements_by_tag_name('td')
-                        link_detail2 = row1.find_element_by_xpath('//td/a')
-                        yield self.make_yeld(data1,link_detail2)
+                        data1 = row1.find_element_by_tag_name('a')
+                        #link_detail2 = row1.find_element_by_xpath('//td/a')
+                        #yield self.make_yeld(data1,link_detail2)
+                        yield { 'linksdetail':data1.get_attribute("href") }
                 except:
                     break
         time.sleep(2)

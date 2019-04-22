@@ -39,7 +39,7 @@ DOWNLOAD_DELAY = 5
 #TELNETCONSOLE_ENABLED = False
 #Export as CSV Feed
 FEED_FORMAT = "csv"
-FEED_URI = "kemkesdet.csv"
+FEED_URI = "forlapdet1.csv"
 # Override the default request headers:
 DEFAULT_REQUEST_HEADERS = {
    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
