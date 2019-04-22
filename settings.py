@@ -19,7 +19,7 @@ NEWSPIDER_MODULE = 'project01.spiders'
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 CONCURRENT_REQUESTS = 1
@@ -39,7 +39,7 @@ DOWNLOAD_DELAY = 5
 #TELNETCONSOLE_ENABLED = False
 #Export as CSV Feed
 FEED_FORMAT = "csv"
-FEED_URI = "forlapdet1.csv"
+FEED_URI = "wikimallbot.csv"
 # Override the default request headers:
 DEFAULT_REQUEST_HEADERS = {
    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
