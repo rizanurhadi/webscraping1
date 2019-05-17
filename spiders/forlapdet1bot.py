@@ -1,3 +1,4 @@
+#! python2
 # -*- coding: utf-8 -*-
 import scrapy
 import csv
@@ -64,7 +65,7 @@ class Forlapdet1botSpider(scrapy.Spider):
                 myyield['jml_mhs_1819'] = datatd[4].css('::text').get()
                 myyield['rasio_dosen_mhs_1819'] = datatd[5].css('::text').get()
 
-            w = csv.DictWriter(f, myyield.keys(), lineterminator='\n')
+            w = csv.DictWriter(f, myyield.keys(), lineterminator='\n', delimiter='|')
             if response.meta.get('iterasi') ==2 : 
                 w.writeheader()
             w.writerow(myyield)
@@ -85,7 +86,7 @@ class Forlapdet1botSpider(scrapy.Spider):
                     myprstudi['jml_dosen_tetap_1819'] =datatd2[8].css('::text').get().strip()
                     myprstudi['jml_mhs_1819'] =datatd2[9].css('::text').get().strip()
                     myprstudi['rasio_dosen_mhs_1819'] =datatd2[10].css('::text').get().strip()
-                    w2 = csv.DictWriter(f2, myprstudi.keys(), lineterminator='\n')
+                    w2 = csv.DictWriter(f2, myprstudi.keys(), lineterminator='\n', delimiter='|')
                     if myitr ==3 : 
                         w2.writeheader()
                     w2.writerow(myprstudi)

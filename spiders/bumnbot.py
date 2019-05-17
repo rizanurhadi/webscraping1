@@ -1,3 +1,4 @@
+#! python2
 # -*- coding: utf-8 -*-
 import scrapy
 import json
@@ -21,7 +22,7 @@ class BumnbotSpider(scrapy.Spider):
 
         fieldnames = ['nomor','bumn', 'logo', 'sektor','situs']
         with open('bumn_%s.csv' % timestr, 'a') as f: 
-            w = csv.writer(f, lineterminator='\n')
+            w = csv.writer(f, lineterminator='\n', delimiter='|',quotechar="'")
             w.writerow(fieldnames)
             for row in data:
                 test1 = re.sub(r"<a.*?>", '', row[1])

@@ -1,3 +1,4 @@
+#! python2
 # -*- coding: utf-8 -*-
 import scrapy
 import csv
@@ -35,7 +36,7 @@ class WikimallbotdetSpider(scrapy.Spider):
                     myyield['parkir'] = ''
                     myyield['situs_web'] = ''
                     with open('wikimall_profile_%s.csv' % timestr, 'a') as myf: 
-                        w = csv.DictWriter(myf, myyield.keys(), lineterminator='\n')
+                        w = csv.DictWriter(myf, myyield.keys(), lineterminator='\n', delimiter='|')
                         if iterasi ==2 : 
                             w.writeheader()
                         w.writerow(myyield)
@@ -66,7 +67,7 @@ class WikimallbotdetSpider(scrapy.Spider):
                 myyield['jumlah_lantai'] = ''
                 myyield['parkir'] = ''
                 myyield['situs_web'] = ''
-            w = csv.DictWriter(f, myyield.keys(), lineterminator='\n')
+            w = csv.DictWriter(f, myyield.keys(), lineterminator='\n', delimiter='|')
             if response.meta.get('iterasi') ==2 : 
                 w.writeheader()
             w.writerow(myyield)

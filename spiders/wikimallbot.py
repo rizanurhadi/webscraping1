@@ -1,3 +1,4 @@
+#! python2
 # -*- coding: utf-8 -*-
 import scrapy
 import csv
@@ -42,15 +43,15 @@ class WikimallbotSpider(scrapy.Spider):
                         kabkot = row.css('dt > a::text').get()
 
                 if row.xpath('name()').get() == 'li' :
-                    if row.css('li') :
+                    if row.css('li') and row.css('li *::text') :
                         myyield['id_ai'] = iterasi
-                        myyield['prov'] = prov
-                        myyield['kabkot'] = kabkot
-                        myyield['nama_mall'] = row.css('li *::text').get()
+                        myyield['prov'] = prov.encode('utf-8')
+                        myyield['kabkot'] = kabkot.encode('utf-8')
+                        myyield['nama_mall'] = row.css('li *::text').get().encode('utf-8')
                         if row.css('li > a::attr(href)') :
-                            detail_link = response.urljoin(row.css('li > a::attr(href)').get())
+                            detail_link = response.urljoin(row.css('li > a::attr(href)').get().encode('utf-8'))
                             if 'index.php' not in detail_link :
-                                myyield['detail_link'] = detail_link
+                                myyield['detail_link'] = detail_link.encode('utf-8')
                             else :
                                 myyield['detail_link'] = ''
                         else :
@@ -58,7 +59,7 @@ class WikimallbotSpider(scrapy.Spider):
                         #link_detail = response.urljoin(link_detail)
                         iterasi += 1
                         subiterasi += 1
-                        w = csv.DictWriter(f, myyield.keys(), lineterminator='\n')
+                        w = csv.DictWriter(f, myyield.keys(), lineterminator='\n', delimiter='|')
                         if iterasi ==2 : 
                             w.writeheader()
                         w.writerow(myyield)
@@ -72,7 +73,7 @@ class WikimallbotSpider(scrapy.Spider):
         if response.css('table.infobox tr') :
             rows = response.css('table.infobox tr')
             for row in rows :
-                myyield[row.css('th::text').get().lower().replace(" ", "_").replace("/", "_")] = myyield[row.css('td a::text').get()]
+                myyield[row.css('th::text').get().lower().replace(" ", "_").replace("/", "_").encode('utf-8')] = myyield[row.css('td a::text').get().encode('utf-8')]
         else : 
             myyield['alamat'] = ''
             myyield['lokasi'] = ''
@@ -87,7 +88,7 @@ class WikimallbotSpider(scrapy.Spider):
             myyield['jumlah_lantai'] = ''
             myyield['parkir'] = ''
             myyield['situs_web'] = ''
-        w = csv.DictWriter(f, myyield.keys(), lineterminator='\n')
+        w = csv.DictWriter(f, myyield.keys(), lineterminator='\n', delimiter='|')
         if iterasi ==2 : 
             w.writeheader()
         w.writerow(myyield)
