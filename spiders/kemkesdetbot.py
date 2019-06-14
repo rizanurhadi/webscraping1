@@ -11,7 +11,7 @@ from scrapy.utils.log import configure_logging
 class KemkesdetbotSpider(scrapy.Spider):
     configure_logging(install_root_handler = False) 
     logging.basicConfig ( 
-        filename = 'out/log_kemkes.txt', 
+        filename = 'out/log_kemkesdet.txt', 
         format = '%(levelname)s: %(message)s', 
         level = logging.INFO 
     )
