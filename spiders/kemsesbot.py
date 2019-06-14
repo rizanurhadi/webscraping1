@@ -22,7 +22,7 @@ class KemsesbotSpider(scrapy.Spider):
         rows = self.driver.find_elements_by_xpath('//tr')
         #yield { 'table' : rows.get() }
         i = 0
-        with open('kemkesbot_%s.csv' % timestr, 'a') as f:
+        with open('out/kemkesbot_%s.csv' % timestr, 'a') as f:
             for row in rows :
                 i += 1
                 if i > 6 :
