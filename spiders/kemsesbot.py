@@ -3,20 +3,23 @@
 import scrapy
 import time
 import csv
+import os 
 from selenium import webdriver
 import logging 
 from scrapy.utils.log import configure_logging  
 
 class KemsesbotSpider(scrapy.Spider):
+    dir_path = os.path.dirname(os.path.realpath(__file__))
     configure_logging(install_root_handler = False) 
     logging.basicConfig ( 
-        filename = 'out/log_kemkes.txt', 
+        filename = dir_path + '/../out/log_kemkes.txt', 
         format = '%(levelname)s: %(message)s', 
         level = logging.INFO 
     )
     name = 'kemsesbot'
     allowed_domains = ['sirs.yankes.kemkes.go.id']
     start_urls = ['http://sirs.yankes.kemkes.go.id/rsonline/DATA_RUMAH_SAKIT_REPORT_report.php?pagesize=-1/']
+    fieldnames = ['kode','tgl_registrasi','nama','jenis','kelas','direktur','alamat','penyelenggara','kab_kota','kodepos','telephone','fax','tgl_update','produk']
 
     def __init__(self):
         self.driver = webdriver.Chrome(executable_path='D:/scrapy_script/chromedriver_win32/chromedriver.exe')
@@ -28,7 +31,7 @@ class KemsesbotSpider(scrapy.Spider):
         rows = self.driver.find_elements_by_xpath('//tr')
         #yield { 'table' : rows.get() }
         i = 0
-        with open('out/kemkesbot_%s.csv' % timestr, 'a') as f:
+        with open(self.dir_path + '/../out/kemkesbot_%s.csv' % timestr, 'a') as f:
             for row in rows :
                 i += 1
                 if i > 6 :
@@ -48,8 +51,9 @@ class KemsesbotSpider(scrapy.Spider):
                         'telephone':data[10].text.encode('ascii', 'replace'),
                         'fax':data[11].text.encode('ascii', 'replace'),
                         'tgl_update':data[12].text.encode('ascii', 'replace'),
+                        
                     }
-                    w = csv.DictWriter(f, myyield.keys(), lineterminator='\n', delimiter='|')
+                    w = csv.DictWriter(f, self.fieldnames, lineterminator='\n', delimiter='|')
                     if i == 7 : 
                         w.writeheader()
                     w.writerow(myyield)
