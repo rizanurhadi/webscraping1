@@ -3,6 +3,7 @@
 import scrapy
 import csv
 import time
+import os
 
 
 
@@ -10,16 +11,23 @@ class Forlapdet1botSpider(scrapy.Spider):
     name = 'forlapdet1bot'
     allowed_domains = ['forlap.ristekdikti.go.id/perguruantinggi/detail']
     start_urls = ['https://forlap.ristekdikti.go.id/perguruantinggi/detail/NTJERDQ0MTEtREREMC00RkU2LUI1RUMtRjZGMzY3REJDRjk3']
-    
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    timestr = time.strftime("%Y%m%d-%H%M%S")
+    filename1 = dir_path + '/../out/forlap_pt_profile%s.csv' % timestr
+    filename2 = dir_path + '/../out/forlap_perguruan_tinggi.csv'
+    filename3 = dir_path + '/../out/forlap_pt_program_st%s.csv' % timestr
+    fieldnames = []
+    fieldnames2 = []
+
     def start_requests(self):
-        timestr = time.strftime("%Y%m%d-%H%M%S")
         iterasi = 1
-        with open('forlap_perguruan_tinggi.csv', 'r') as f:
-            datareader = csv.reader(f)
+        csv.register_dialect('myDialect',delimiter='|')
+        with open(self.filename2, 'r') as f:
+            datareader = csv.reader(f,dialect = 'myDialect')
             next(datareader)
             for row in datareader:
                 iterasi += 1
-                yield scrapy.Request(row[2], self.parse_profile, meta={'timestr':timestr,'iterasi':iterasi,'kode':row[0]})
+                yield scrapy.Request(row[2], self.parse_profile, meta={'iterasi':iterasi,'kode':row[0]})
 
     def parse(self, response):
         """
@@ -48,11 +56,11 @@ class Forlapdet1botSpider(scrapy.Spider):
         myprstudi = {"kodept": response.meta.get('kode')}
         #ptdetail
         mytable = response.xpath('//table[@class="table table-bordered"]') 
-        with open('forlap_pt_profile%s.csv' % response.meta.get('timestr'), 'a') as f:  # Just use 'w' mode in 3.x
+        with open(self.filename1, 'a') as f:  # Just use 'w' mode in 3.x
             for row in response.css('table[class=table1] tr'):
                 data = row.css('td')
                 if data[2].css('::text').get() :
-                    myyield[data[0].css('::text').get().lower().replace(" ", "_").replace("/", "_")]= data[2].css('::text').get().strip()
+                    myyield[data[0].css('::text').get().lower().replace(" ", "_").replace("/", "_")]= data[2].css('::text').get().replace('\n', ' ').replace('\r', ' ').strip()
                 else :
                     myyield[data[0].css('::text').get().lower().replace(" ", "_").replace("/", "_")]= ''
             
@@ -70,7 +78,7 @@ class Forlapdet1botSpider(scrapy.Spider):
                 w.writeheader()
             w.writerow(myyield)
 
-        with open('forlap_pt_program_st%s.csv' % response.meta.get('timestr'), 'a') as f2:
+        with open(self.filename3, 'a') as f2:
             myitr = 0
             for alltr in mytable[1].css('tr') :
                 myitr +=1

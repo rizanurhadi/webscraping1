@@ -4,7 +4,8 @@ import scrapy
 import time
 import csv
 from selenium import webdriver
-from scrapy.selector import Selector
+#from scrapy.selector import Selector
+import os
 
 
 
@@ -12,7 +13,11 @@ class ForlapbotSpider(scrapy.Spider):
     name = 'forlapbot'
     allowed_domains = ['forlap.ristekdikti.go.id']
     start_urls = ['https://forlap.ristekdikti.go.id/perguruantinggi/']
-    #handle_httpstatus_list = [302]
+    fieldnames = ['kode','nama', 'link_detail', 'prov','kategori','status','jml_dosen_tetap_1718', 'jml_mhs_1718' , 'rasio_dosen_mhs_1718', 'jml_dosen_tetap_1819', 'jml_mhs_1819' , 'rasio_dosen_mhs_1819']
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    timestr = time.strftime("%Y%m%d-%H%M%S")
+    filename1 = dir_path + '/../out/forlap_pt_header_%s.csv' % timestr
+    filename2 = dir_path + '/../out/forlap_perguruan_tinggi.csv'
     
     def __init__(self):
         self.driver = webdriver.Chrome(executable_path='D:/scrapy_script/chromedriver_win32/chromedriver.exe')
@@ -29,8 +34,7 @@ class ForlapbotSpider(scrapy.Spider):
         mybtn.click()
         time.sleep(10)
         iterasi = 1
-        timestr = time.strftime("%Y%m%d-%H%M%S")
-        with open('forlap_pt_header_%s.csv' % timestr, 'a') as f:
+        with open(self.filename1, 'a') as f:
             rows = self.driver.find_elements_by_class_name("ttop")
             #item = BasicItem()
             for row in rows:
@@ -38,7 +42,7 @@ class ForlapbotSpider(scrapy.Spider):
                 data = row.find_elements_by_tag_name('td')
                 link_detail = row.find_element_by_tag_name('a')
                 myyield = self.make_yeld(data,link_detail)  
-                w = csv.DictWriter(f, myyield.keys(), lineterminator='\n', delimiter='|') 
+                w = csv.DictWriter(f, self.fieldnames, lineterminator='\n', delimiter='|') 
                 if iterasi ==2 : 
                     w.writeheader()
                 w.writerow(myyield)
@@ -58,18 +62,15 @@ class ForlapbotSpider(scrapy.Spider):
                             link_detail2 = row1.find_element_by_tag_name('a')
                             #yield self.make_yeld(data1,link_detail2)
                             myyield = self.make_yeld(data1,link_detail2)  
-                            w = csv.DictWriter(f, myyield.keys(), lineterminator='\n', delimiter='|') 
-                            if iterasi ==2 : 
-                                w.writeheader()
+                            w = csv.DictWriter(f, self.fieldnames, lineterminator='\n', delimiter='|') 
+                            #if iterasi ==2 : 
+                            #    w.writeheader()
                             w.writerow(myyield)
                             self.write_secondfile(myyield,iterasi)
                     except:
                         break
             time.sleep(2)
             self.driver.quit()
-        
-    def after_login(self, response):
-        yield {'body':response.css('html').extract()}
     
     def make_yeld(self, data,link_detail):
         return {
@@ -78,7 +79,7 @@ class ForlapbotSpider(scrapy.Spider):
              'link_detail' : link_detail.get_attribute("href"),
              'prov': data[3].text,
              'kategori': data[4].text,
-             'Status': data[5].text,
+             'status': data[5].text,
              'jml_dosen_tetap_1718': data[6].text,
              'jml_mhs_1718': data[7].text,
              'rasio_dosen_mhs_1718': data[8].text,
@@ -111,12 +112,12 @@ class ForlapbotSpider(scrapy.Spider):
 
     def write_secondfile(self,myyield,iterasi):
         if iterasi ==2 :
-            with open('forlap_perguruan_tinggi.csv', 'w') as f:
+            with open(self.filename2, 'w') as f:
                 w = csv.DictWriter(f, ['kode','nama','link_detail'], lineterminator='\n', delimiter='|') 
                 if iterasi ==2 : 
                     w.writeheader()
                 w.writerow({'kode':myyield['kode'],'nama':myyield['nama'],'link_detail':myyield['link_detail']})
         else :
-            with open('forlap_perguruan_tinggi.csv', 'a') as f:
+            with open(self.filename2, 'a') as f:
                 w = csv.DictWriter(f, ['kode','nama','link_detail'], lineterminator='\n', delimiter='|') 
                 w.writerow({'kode':myyield['kode'],'nama':myyield['nama'],'link_detail':myyield['link_detail']})
