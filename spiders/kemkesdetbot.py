@@ -5,27 +5,40 @@ import time
 import csv
 import os
 from sys import exit
-import logging 
-from scrapy.utils.log import configure_logging  
+#import logging 
+#from scrapy.utils.log import configure_logging  
+from scrapy import signals
 
 
 class KemkesdetbotSpider(scrapy.Spider):
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    configure_logging(install_root_handler = False) 
-    logging.basicConfig ( 
-        filename = dir_path + '/../out/log_kemkesdet.txt', 
-        format = '%(levelname)s: %(message)s', 
-        level = logging.WARNING 
-    )
+    #configure_logging(install_root_handler = False) 
+    #logging.basicConfig ( 
+    #   filename = dir_path + '/../out/log_kemkesdet.txt', 
+    #    format = '%(levelname)s: %(message)s', 
+    #    level = logging.WARNING 
+    #)
+    timestr = time.strftime("%Y%m%d-%H%M%S")
     name = 'kemkesdetbot'
     allowed_domains = ['sirs.yankes.kemkes.go.id']
     start_urls = ['http://sirs.yankes.kemkes.go.id/rsonline/data_view.php?editid1=']
     fieldnames = ['kode_rs','tgl_registrasi','rumah_sakit','jenis','kls_rs','direktur_rs','latar_belakang_pendidikan']
+    filename1 = dir_path + '/../out/kemses_detail_%s.csv' % timestr
+
+    @classmethod
+    def from_crawler(cls, crawler, *args, **kwargs):
+        spider = super(KemkesdetbotSpider, cls).from_crawler(crawler, *args, **kwargs)
+        crawler.signals.connect(spider.spider_closed, signal=signals.spider_closed)
+        return spider
+    
+    def spider_closed(self, spider):
+        spider.logger.info('Signal sent then Spider closed. file out is : %s', self.filename1)
+        #save to db here
+        #forlapbottodbmy.readcsvandupdate(self.allowed_domains[0],self.filename1)
     
     def start_requests(self):
-        timestr = time.strftime("%Y%m%d-%H%M%S")
         iterasi = 1
-        yield scrapy.Request(self.start_urls[0] + '1',meta={'iterasi':iterasi,'timestr':timestr,'page':1})
+        yield scrapy.Request(self.start_urls[0] + '1',meta={'iterasi':iterasi,'page':1})
 
     def parse(self, response):
         #print(len(response.css('table[id=fields_block1] tr td::text')[1].get())
@@ -36,7 +49,7 @@ class KemkesdetbotSpider(scrapy.Spider):
                 'update':''
             }
             
-            with open(self.dir_path + '/../out/kemses_detail_%s.csv' % response.meta.get('timestr'), 'a') as f:
+            with open(self.filename1, 'a') as f:
                 iterasi = response.meta.get('iterasi')
                 if response.css('table[id=fields_block1] tr td::text') :
                     for row in response.css('table[id=fields_block1] tr'):
@@ -106,4 +119,4 @@ class KemkesdetbotSpider(scrapy.Spider):
                 #time.sleep(2)
                 next_page = 'http://sirs.yankes.kemkes.go.id/rsonline/data_view.php?editid1=' + str(page)
                 #exit(0) if page == 6 else None
-                yield scrapy.Request(next_page, callback=self.parse, meta={'iterasi':iterasi,'timestr':response.meta.get('timestr'),'page': page })
+                yield scrapy.Request(next_page, callback=self.parse, meta={'iterasi':iterasi,'page': page })

@@ -6,7 +6,8 @@ import csv
 from selenium import webdriver
 #from scrapy.selector import Selector
 import os
-
+from scrapy import signals
+import forlapbottodbmy
 
 
 class ForlapbotSpider(scrapy.Spider):
@@ -19,6 +20,18 @@ class ForlapbotSpider(scrapy.Spider):
     filename1 = dir_path + '/../out/forlap_pt_header_%s.csv' % timestr
     filename2 = dir_path + '/../out/forlap_perguruan_tinggi.csv'
     
+    @classmethod
+    def from_crawler(cls, crawler, *args, **kwargs):
+        spider = super(ForlapbotSpider, cls).from_crawler(crawler, *args, **kwargs)
+        crawler.signals.connect(spider.spider_closed, signal=signals.spider_closed)
+        return spider
+    
+    def spider_closed(self, spider):
+        spider.logger.info('Signal sent then Spider closed. file out is : %s', self.filename1)
+        #save to db here
+        forlapbottodbmy.readcsvandupdate(self.allowed_domains[0],self.filename1)
+
+
     def __init__(self):
         self.driver = webdriver.Chrome(executable_path='D:/scrapy_script/chromedriver_win32/chromedriver.exe')
 

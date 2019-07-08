@@ -4,6 +4,7 @@ import scrapy
 import csv
 import time
 import os
+from scrapy import signals
 
 
 
@@ -19,6 +20,17 @@ class Forlapdet1botSpider(scrapy.Spider):
     fieldnames = []
     fieldnames2 = []
 
+    @classmethod
+    def from_crawler(cls, crawler, *args, **kwargs):
+        spider = super(Forlapdet1botSpider, cls).from_crawler(crawler, *args, **kwargs)
+        crawler.signals.connect(spider.spider_closed, signal=signals.spider_closed)
+        return spider
+    
+    def spider_closed(self, spider):
+        spider.logger.info('Signal sent then Spider closed. file out is : %s', self.filename1)
+        #save to db here
+        #forlapbottodbmy.readcsvandupdate(self.allowed_domains[0],self.filename1)
+    
     def start_requests(self):
         iterasi = 1
         csv.register_dialect('myDialect',delimiter='|')

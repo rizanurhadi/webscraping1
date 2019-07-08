@@ -5,6 +5,7 @@ import time
 import csv
 from sys import exit
 import os
+from scrapy import signals
 
 
 class KemendagbotSpider(scrapy.Spider):
@@ -14,8 +15,18 @@ class KemendagbotSpider(scrapy.Spider):
     dir_path = os.path.dirname(os.path.realpath(__file__))
     timestr = time.strftime("%Y%m%d-%H%M%S")
     filename1 = dir_path + '/../out/kemendag_%s.csv' % timestr
-    fieldnames = ['no', 'nama_perusahaan', 'kontak', 'posisi', "alamat", "ph", "fax","kecamatan","kabupaten","provinsi","product"]
+    fieldnames = ['no', 'nama_perusahaan', 'kontak', 'posisi', 'alamat', 'ph', 'fax','kecamatan','kabupaten','provinsi','product']
 
+    @classmethod
+    def from_crawler(cls, crawler, *args, **kwargs):
+        spider = super(KemendagbotSpider, cls).from_crawler(crawler, *args, **kwargs)
+        crawler.signals.connect(spider.spider_closed, signal=signals.spider_closed)
+        return spider
+    
+    def spider_closed(self, spider):
+        spider.logger.info('Signal sent then Spider closed. file out is : %s', self.filename1)
+        #save to db here
+        #forlapbottodbmy.readcsvandupdate(self.allowed_domains[0],self.filename1)
 
     def start_requests(self):
         iterasi = 1
