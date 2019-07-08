@@ -29,6 +29,9 @@ class KemsesbotSpider(scrapy.Spider):
         time.sleep(2.5)
         timestr = time.strftime("%Y%m%d-%H%M%S")
         rows = self.driver.find_elements_by_xpath('//tr')
+        myyield = {
+            'kode':''
+        }
         #yield { 'table' : rows.get() }
         i = 0
         with open(self.dir_path + '/../out/kemkesbot_%s.csv' % timestr, 'a') as f:
@@ -37,22 +40,34 @@ class KemsesbotSpider(scrapy.Spider):
                 if i > 6 :
                     print('save iterasi ke: ' + str(i))
                     data = row.find_elements_by_tag_name('td')
-                    myyield = {
-                        'kode' : data[0].text.encode('ascii', 'replace'),
-                        'tgl_registrasi':data[1].text.encode('ascii', 'replace'),
-                        'nama':data[2].text.encode('ascii', 'replace'),
-                        'jenis':data[3].text.encode('ascii', 'replace'),
-                        'kelas':data[4].text.encode('ascii', 'replace'),
-                        'direktur':data[5].text.encode('ascii', 'replace'),
-                        'alamat':data[6].text.encode('ascii', 'replace'),
-                        'penyelenggara':data[7].text.encode('ascii', 'replace'),
-                        'kab_kota':data[8].text.encode('ascii', 'replace'),
-                        'kodepos':data[9].text.encode('ascii', 'replace'),
-                        'telephone':data[10].text.encode('ascii', 'replace'),
-                        'fax':data[11].text.encode('ascii', 'replace'),
-                        'tgl_update':data[12].text.encode('ascii', 'replace'),
-                        
-                    }
+                    
+                    if data[0] :
+                        myyield['kode'] = data[0].text.encode('ascii', 'replace')
+                    if data[1] :
+                        myyield['tgl_registrasi'] = data[1].text.encode('ascii', 'replace')
+                    if data[2] :
+                        myyield['nama'] = data[2].text.encode('ascii', 'replace')
+                    if data[3] :
+                        myyield['jenis'] = data[3].text.encode('ascii', 'replace')
+                    if data[4] :
+                        myyield['kelas'] = data[4].text.encode('ascii', 'replace')
+                    if data[5] :
+                        myyield['direktur'] = data[5].text.encode('ascii', 'replace')
+                    if data[6] :
+                        myyield['alamat'] = data[6].text.encode('ascii', 'replace')
+                    if data[7] :
+                        myyield['penyelenggara'] = data[7].text.encode('ascii', 'replace')
+                    if data[8] :
+                        myyield['kab_kota'] = data[8].text.encode('ascii', 'replace')
+                    if data[9] :
+                        myyield['kodepos'] = data[9].text.encode('ascii', 'replace')
+                    if data[10] :
+                        myyield['telephone'] = data[10].text.encode('ascii', 'replace')
+                    if data[11] :
+                        myyield['fax'] = data[11].text.encode('ascii', 'replace')
+                    if data[12] :
+                        myyield['tgl_update'] = data[12].text.encode('ascii', 'replace')
+                    
                     w = csv.DictWriter(f, self.fieldnames, lineterminator='\n', delimiter='|')
                     if i == 7 : 
                         w.writeheader()
