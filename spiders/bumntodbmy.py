@@ -5,6 +5,7 @@ import mysql.connector
 from configdbmy import config
 import csv
 import time
+import os
 
 def readcsvandupdate(website,filecsv):
     print("reading file from %s", filecsv)
@@ -20,8 +21,8 @@ def readcsvandupdate(website,filecsv):
                 rowid = update(rowid,website,timestr,row[1],row[3],row[4])
             else :
                 rowid = insert(website,timestr,row[1],row[3],row[4])
-            print("saved data %s with id %s", (rowid,row[1]))
-        print("save file one by one")
+                print("saved data %s with id %s", (rowid,row[1]))
+    os.remove(filecsv)
 
 def insert(website,crdate,nama,sektor,situs):
     mysqldb = mysql.connector
@@ -58,6 +59,7 @@ def insert(website,crdate,nama,sektor,situs):
         cur.close()
     except (Exception, mysqldb.DatabaseError) as error:
         print(error)
+        print('insert error')
     finally:
         if conn is not None:
             conn.close()
@@ -78,7 +80,7 @@ def update(id,website,crdate,nama,sektor,situs):
     """ Insert with cek if exists"""
     sql = """ 
     UPDATE bumn 
-    SET nama=%s, sektor=%s,situs=%s, crawl_date=%s) 
+    SET nama=%s, sektor=%s,situs=%s, crawl_date=%s
     WHERE id=%s
     ;"""
     conn = None
@@ -101,6 +103,7 @@ def update(id,website,crdate,nama,sektor,situs):
         cur.close()
     except (Exception, mysqldb.DatabaseError) as error:
         print(error)
+        print('update error')
     finally:
         if conn is not None:
             conn.close()
@@ -116,12 +119,16 @@ def get_one(name):
         params = config()
         conn = mysqldb.connect(**params)
         cur = conn.cursor()
-        cur.execute("SELECT id FROM bumn WHERE nama = %s", name)
-        #print("The number of parts: ", cur.rowcount)
-        row = cur.fetchone()
+        sql ="SELECT id FROM bumn WHERE nama = %s LIMIT 1"
+        cur.execute(sql,(name,))
+        rowid = cur.fetchone()
+        if rowid :
+            row = rowid[0]
+        #print(rowid)
         cur.close()
     except (Exception, mysqldb.DatabaseError) as error:
         print(error)
+        print('get one error')
     finally:
         if conn is not None:
             conn.close()
@@ -158,3 +165,6 @@ def connect():
         if conn is not None:
             conn.close()
             print('Database connection closed.')
+
+#if __name__ == '__main__':
+#    get_one('PT Semen Baturaja')

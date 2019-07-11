@@ -5,6 +5,7 @@ import mysql.connector
 from configdbmy import config
 import csv
 import time
+import os
 
 def readcsvandupdate(website,filecsv):
     print("reading file from %s", filecsv)
@@ -13,14 +14,14 @@ def readcsvandupdate(website,filecsv):
     csv.register_dialect('myDialect', delimiter = '|')
     with open(filecsv, 'r') as f:
         reader = csv.reader(f, dialect='myDialect')
+        next(reader)
         for row in reader :
             rowid = get_one(row[1])
             if rowid :
                 rowid = update(rowid,website,timestr,row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11])
             else :
                 rowid = insert(website,timestr,row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11])
-            print("saved data %s with id %s", (rowid,row[1]))
-        print("save file one by one")
+    os.remove(filecsv)
 
 def insert(website,crdate,kode,nama, link_detail, prov,kategori,status,jml_dosen_tetap_1718, jml_mhs_1718 , rasio_dosen_mhs_1718, jml_dosen_tetap_1819, jml_mhs_1819 , rasio_dosen_mhs_1819):
     mysqldb = mysql.connector
@@ -58,6 +59,7 @@ def insert(website,crdate,kode,nama, link_detail, prov,kategori,status,jml_dosen
         cur = conn.cursor()
         # execute the INSERT statement
         cur.execute(sql, (crdate, kode,nama, link_detail, prov,kategori,status,jml_dosen_tetap_1718, jml_mhs_1718 , rasio_dosen_mhs_1718, jml_dosen_tetap_1819, jml_mhs_1819 , rasio_dosen_mhs_1819))
+        
         # get the generated id back
         #vendor_id = cur.fetchone()[0]
         vendor_id = cur.lastrowid
@@ -65,8 +67,10 @@ def insert(website,crdate,kode,nama, link_detail, prov,kategori,status,jml_dosen
         conn.commit()
         # close communication with the database
         cur.close()
+        
     except (Exception, mysqldb.DatabaseError) as error:
         print(error)
+        
     finally:
         if conn is not None:
             conn.close()
@@ -99,8 +103,10 @@ def update(id,website,crdate,kode,nama, link_detail, prov,kategori,status,jml_do
         conn.commit()
         # close communication with the database
         cur.close()
+        print('update suskes')
     except (Exception, mysqldb.DatabaseError) as error:
         print(error)
+        print('update error')
     finally:
         if conn is not None:
             conn.close()
@@ -116,12 +122,17 @@ def get_one(name):
         params = config()
         conn = mysqldb.connect(**params)
         cur = conn.cursor()
-        cur.execute("SELECT id FROM forlap_header WHERE nama = %s", name)
+        sql = "SELECT id FROM forlap_header WHERE nama = %s LIMIT 1"
+        cur.execute(sql,(name,))
         #print("The number of parts: ", cur.rowcount)
-        row = cur.fetchone()
+        rowid = cur.fetchone()
+        if rowid :
+            row = rowid[0]
         cur.close()
+        print('getone sukses')
     except (Exception, mysqldb.DatabaseError) as error:
         print(error)
+        print('getone error')
     finally:
         if conn is not None:
             conn.close()

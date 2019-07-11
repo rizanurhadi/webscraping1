@@ -5,6 +5,7 @@ import mysql.connector
 from configdbmy import config
 import csv
 import time
+import os
 
 def readcsvandupdate(website,filecsv):
     print("reading file from %s", filecsv)
@@ -19,8 +20,7 @@ def readcsvandupdate(website,filecsv):
                 rowid = update(rowid,website,timestr,row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10])
             else :
                 rowid = insert(website,timestr,row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10])
-            print("saved data %s with id %s", (rowid,row[1]))
-        print("save file one by one")
+    os.remove(filecsv)
 
 def insert(website,crdate,no, nama_perusahaan, kontak, posisi, alamat, ph, fax,kecamatan,kabupaten,provinsi,product):
     mysqldb = mysql.connector
@@ -115,9 +115,11 @@ def get_one(name):
         params = config()
         conn = mysqldb.connect(**params)
         cur = conn.cursor()
-        cur.execute("SELECT id FROM kemendag WHERE nama = %s", name)
-        #print("The number of parts: ", cur.rowcount)
-        row = cur.fetchone()
+        sql = "SELECT id FROM kemendag WHERE nama_perusahaan = %s limit 1"
+        cur.execute(sql,(name,))
+        rowid = cur.fetchone()
+        if rowid :
+            row = rowid[0]
         cur.close()
     except (Exception, mysqldb.DatabaseError) as error:
         print(error)

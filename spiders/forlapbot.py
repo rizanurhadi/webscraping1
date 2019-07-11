@@ -61,7 +61,7 @@ class ForlapbotSpider(scrapy.Spider):
                 w.writerow(myyield)
                 self.write_secondfile(myyield,iterasi)
         
-            gotroughpage = True
+            gotroughpage = False
             if gotroughpage == True :
                 while True:
                     mylia = self.driver.find_element_by_xpath('//li[@class="active"]/following-sibling::li/a')
@@ -87,18 +87,18 @@ class ForlapbotSpider(scrapy.Spider):
     
     def make_yeld(self, data,link_detail):
         return {
-             'kode': data[1].text,
-             'nama': data[2].text,
-             'link_detail' : link_detail.get_attribute("href"),
-             'prov': data[3].text,
-             'kategori': data[4].text,
-             'status': data[5].text,
-             'jml_dosen_tetap_1718': data[6].text,
-             'jml_mhs_1718': data[7].text,
-             'rasio_dosen_mhs_1718': data[8].text,
-             'jml_dosen_tetap_1819': data[9].text,
-             'jml_mhs_1819': data[10].text,
-             "rasio_dosen_mhs_1819": data[11].text
+             'kode': data[1].text.strip(),
+             'nama': data[2].text.strip(),
+             'link_detail' : link_detail.get_attribute("href").strip(),
+             'prov': data[3].text.strip(),
+             'kategori': data[4].text.strip(),
+             'status': data[5].text.strip(),
+             'jml_dosen_tetap_1718': data[6].text.strip(),
+             'jml_mhs_1718': data[7].text.strip(),
+             'rasio_dosen_mhs_1718': data[8].text.strip(),
+             'jml_dosen_tetap_1819': data[9].text.strip(),
+             'jml_mhs_1819': data[10].text.strip(),
+             "rasio_dosen_mhs_1819": data[11].text.strip()
             }
     def parse_detail(self, response) :
         mytable = response.xpath('//table[@class="table table-bordered"]') 
