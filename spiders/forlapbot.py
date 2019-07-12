@@ -4,6 +4,7 @@ import scrapy
 import time
 import csv
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 #from scrapy.selector import Selector
 import os
 from scrapy import signals
@@ -14,6 +15,10 @@ class ForlapbotSpider(scrapy.Spider):
     name = 'forlapbot'
     allowed_domains = ['forlap.ristekdikti.go.id']
     start_urls = ['https://forlap.ristekdikti.go.id/perguruantinggi/']
+    options = Options()
+    options.add_argument('--no-sandbox')
+    options.add_argument('--headless')
+    options.add_argument('--disable-dev-shm-usage')
     fieldnames = ['kode','nama', 'link_detail', 'prov','kategori','status','jml_dosen_tetap_1718', 'jml_mhs_1718' , 'rasio_dosen_mhs_1718', 'jml_dosen_tetap_1819', 'jml_mhs_1819' , 'rasio_dosen_mhs_1819']
     dir_path = os.path.dirname(os.path.realpath(__file__))
     timestr = time.strftime("%Y%m%d-%H%M%S")
@@ -34,6 +39,7 @@ class ForlapbotSpider(scrapy.Spider):
 
     def __init__(self):
         self.driver = webdriver.Chrome(executable_path='D:/scrapy_script/chromedriver_win32/chromedriver.exe')
+        #self.driver = webdriver.Chrome('/usr/bin/chromedriver', chrome_options=self.options, service_args=['--verbose', '--log-path=/root/crawling/chromedriver.log'])
 
     def parse(self, response):
         self.driver.get(response.url)
@@ -61,7 +67,7 @@ class ForlapbotSpider(scrapy.Spider):
                 w.writerow(myyield)
                 self.write_secondfile(myyield,iterasi)
         
-            gotroughpage = False
+            gotroughpage = True
             if gotroughpage == True :
                 while True:
                     mylia = self.driver.find_element_by_xpath('//li[@class="active"]/following-sibling::li/a')

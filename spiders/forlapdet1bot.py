@@ -5,7 +5,8 @@ import csv
 import time
 import os
 from scrapy import signals
-
+import forlapdetproftodbmy
+import forlapdetprgsttodbmy
 
 
 class Forlapdet1botSpider(scrapy.Spider):
@@ -17,8 +18,10 @@ class Forlapdet1botSpider(scrapy.Spider):
     filename1 = dir_path + '/../out/forlap_pt_profile%s.csv' % timestr
     filename2 = dir_path + '/../out/forlap_perguruan_tinggi.csv'
     filename3 = dir_path + '/../out/forlap_pt_program_st%s.csv' % timestr
-    fieldnames = []
-    fieldnames2 = []
+    #profile
+    fieldnames = ['kode','status_pt','tanggal_sk_pt','tanggal_berdiri','perguruan_tinggi','website','telepon','kode_pos','email','faximile','kota_kabupaten','alamat','nomor_sk_pt','jml_mhs_1718','jml_dosen_tetap_1718','rasio_dosen_mhs_1718','jml_mhs_1819','jml_dosen_tetap_1819','rasio_dosen_mhs_1819']
+    #programstudi
+    fieldnames2 = ['kodept','kode','nama','status','jenjang','jml_dosen_tetap_1718','jml_mhs_1718','rasio_dosen_mhs_1718','jml_dosen_tetap_1819','jml_mhs_1819','rasio_dosen_mhs_1819']
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
@@ -29,7 +32,8 @@ class Forlapdet1botSpider(scrapy.Spider):
     def spider_closed(self, spider):
         spider.logger.info('Signal sent then Spider closed. file out is : %s', self.filename1)
         #save to db here
-        #forlapbottodbmy.readcsvandupdate(self.allowed_domains[0],self.filename1)
+        forlapdetproftodbmy.readcsvandupdate(self.allowed_domains[0],self.filename1)
+        forlapdetprgsttodbmy.readcsvandupdate(self.allowed_domains[0],self.filename3)
     
     def start_requests(self):
         iterasi = 1
@@ -40,6 +44,8 @@ class Forlapdet1botSpider(scrapy.Spider):
             for row in datareader:
                 iterasi += 1
                 yield scrapy.Request(row[2], self.parse_profile, meta={'iterasi':iterasi,'kode':row[0]})
+                if iterasi == 5 :
+                    exit(0)
 
     def parse(self, response):
         """
@@ -85,7 +91,7 @@ class Forlapdet1botSpider(scrapy.Spider):
                 myyield['jml_mhs_1819'] = datatd[4].css('::text').get()
                 myyield['rasio_dosen_mhs_1819'] = datatd[5].css('::text').get()
 
-            w = csv.DictWriter(f, myyield.keys(), lineterminator='\n', delimiter='|')
+            w = csv.DictWriter(f, self.fieldnames, lineterminator='\n', delimiter='|')
             if response.meta.get('iterasi') ==2 : 
                 w.writeheader()
             w.writerow(myyield)
@@ -106,7 +112,7 @@ class Forlapdet1botSpider(scrapy.Spider):
                     myprstudi['jml_dosen_tetap_1819'] =datatd2[8].css('::text').get().strip()
                     myprstudi['jml_mhs_1819'] =datatd2[9].css('::text').get().strip()
                     myprstudi['rasio_dosen_mhs_1819'] =datatd2[10].css('::text').get().strip()
-                    w2 = csv.DictWriter(f2, myprstudi.keys(), lineterminator='\n', delimiter='|')
+                    w2 = csv.DictWriter(f2, self.fieldnames2, lineterminator='\n', delimiter='|')
                     if myitr ==3 : 
                         w2.writeheader()
                     w2.writerow(myprstudi)

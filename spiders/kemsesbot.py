@@ -6,8 +6,10 @@ import csv
 import os 
 from selenium import webdriver
 import logging 
+from selenium.webdriver.chrome.options import Options
 #from scrapy.utils.log import configure_logging  
 from scrapy import signals
+import kemkesbottodbmy
 
 class KemsesbotSpider(scrapy.Spider):
     dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -17,11 +19,15 @@ class KemsesbotSpider(scrapy.Spider):
     #    format = '%(levelname)s: %(message)s', 
     #    level = logging.INFO 
     #)
+    options = Options()
+    options.add_argument('--no-sandbox')
+    options.add_argument('--headless')
+    options.add_argument('--disable-dev-shm-usage')
     timestr = time.strftime("%Y%m%d-%H%M%S")
     name = 'kemsesbot'
     allowed_domains = ['sirs.yankes.kemkes.go.id']
     start_urls = ['http://sirs.yankes.kemkes.go.id/rsonline/DATA_RUMAH_SAKIT_REPORT_report.php?pagesize=-1/']
-    fieldnames = ['kode','tgl_registrasi','nama','jenis','kelas','direktur','alamat','penyelenggara','kab_kota','kodepos','telephone','fax','tgl_update','produk']
+    fieldnames = ['kode','nama','tgl_registrasi','jenis','kelas','direktur','alamat','penyelenggara','kab_kota','kodepos','telephone','fax','tgl_update','produk']
     filename1 = dir_path + '/../out/kemkesbot_%s.csv' % timestr
 
     @classmethod
@@ -33,10 +39,12 @@ class KemsesbotSpider(scrapy.Spider):
     def spider_closed(self, spider):
         spider.logger.info('Signal sent then Spider closed. file out is : %s', self.filename1)
         #save to db here
-        #forlapbottodbmy.readcsvandupdate(self.allowed_domains[0],self.filename1)
+        kemkesbottodbmy.readcsvandupdate(self.allowed_domains[0],self.filename1)
     
     def __init__(self):
         self.driver = webdriver.Chrome(executable_path='D:/scrapy_script/chromedriver_win32/chromedriver.exe')
+        #self.driver = webdriver.Chrome('/usr/bin/chromedriver', chrome_options=self.options, service_args=['--verbose', '--log-path=/root/crawling/chromedriver.log'])
+
     
     def parse(self, response):
         self.driver.get(response.url)

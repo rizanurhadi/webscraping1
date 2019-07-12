@@ -14,6 +14,7 @@ def readcsvandupdate(website,filecsv):
     csv.register_dialect('myDialect', delimiter = '|')
     with open(filecsv, 'r') as f:
         reader = csv.reader(f, dialect='myDialect')
+        next(reader)
         for row in reader :
             rowid = get_one(row[1])
             if rowid :
