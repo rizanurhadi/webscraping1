@@ -23,7 +23,7 @@ def readcsvandupdate(website,filecsv):
             else :
                 rowid = insert(website,timestr,row[1],row[3],row[4])
                 print("saved data %s with id %s", (rowid,row[1]))
-    os.remove(filecsv)
+    #os.remove(filecsv)
 
 def insert(website,crdate,nama,sektor,situs):
     mysqldb = mysql.connector

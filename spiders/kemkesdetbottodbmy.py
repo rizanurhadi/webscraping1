@@ -7,24 +7,25 @@ import csv
 import time
 import os
 
-def readcsvandupdate(website,filecsv):
+def readcsvandupdate(url,filecsv):
     print("reading file from %s", filecsv)
     timestr = time.strftime("%Y-%m-%d %H:%M:%S")
-    #fieldnames = ['kode_rs','rumah_sakit','tgl_registrasi','jenis','kls_rs','direktur_rs','latar_belakang_pendidikan']
+    #fieldnames = ['kode_rs','rumah_sakit','tgl_registrasi','jenis','kls_rs','direktur_rs','latar_belakang_pendidikan','pemilik','alamat','kode_pos','telepon','fax','email','telepon_humas','website','status_akreditasi']
     csv.register_dialect('myDialect', delimiter = '|')
     with open(filecsv, 'r') as f:
         reader = csv.reader(f, dialect='myDialect')
         next(reader)
         for row in reader :
-            rowid = get_one(row[1])
+            rowid = get_one(row[0])
             if rowid :
-                update(rowid,website,timestr,row[0],row[1],row[2],row[3],row[4],row[5],row[6])
+                update(rowid,url,timestr,row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11],row[12],row[13],row[14],row[15])
             else :
-                rowid = insert(website,timestr,row[0],row[1],row[2],row[3],row[4],row[5],row[6])
+                rowid = insert(url,timestr,row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11],row[12],row[13],row[14],row[15])
             print("saved data %s with id %s", (rowid,row[1]))
         #print("save file one by one")
+    os.remove(filecsv)
 
-def insert(website,crdate,kode_rs,rumah_sakit,tgl_registrasi,jenis,kls_rs,direktur_rs,latar_belakang_pendidikan):
+def insert(url,crdate,kode_rs,rumah_sakit,tgl_registrasi,jenis,kls_rs,direktur_rs,latar_belakang_pendidikan,pemilik,alamat,kode_pos,telepon,fax,email,telepon_humas,website,status_akreditasi):
     mysqldb = mysql.connector
     #fieldnames = ['kode_rs','tgl_registrasi','rumah_sakit','jenis','kls_rs','direktur_rs','latar_belakang_pendidikan']
     """create table kemkes_profile(
@@ -36,14 +37,23 @@ def insert(website,crdate,kode_rs,rumah_sakit,tgl_registrasi,jenis,kls_rs,direkt
         kls_rs varchar(100)  null, 
         direktur_rs varchar(200)  null,
         latar_belakang_pendidikan varchar(200)  null,
+        pemilik varchar(200) null,
+        alamat varchar(200) null,
+        kode_pos varchar(200) null,
+        telepon varchar(200) null,
+        fax varchar(200) null,
+        email varchar(200) null,
+        telepon_humas varchar(200) null,
+        website varchar(200) null,
+        status_akreditasi varchar(200) null,
         crawl_date datetime null
         )
         """
     """ insert a new vendor into the vendors table """
     """ Insert with cek if exists"""
     sql = """ 
-    INSERT INTO kemkes_profile (crawl_date, kode_rs,rumah_sakit,tgl_registrasi,jenis,kls_rs,direktur_rs,latar_belakang_pendidikan) 
-    VALUES (%s,%s, %s, %s,%s,%s, %s, %s);"""
+    INSERT INTO kemkes_profile (crawl_date, kode_rs,rumah_sakit,tgl_registrasi,jenis,kls_rs,direktur_rs,latar_belakang_pendidikan,pemilik,alamat,kode_pos,telepon,fax,email,telepon_humas,website,status_akreditasi) 
+    VALUES (%s,%s,%s,%s,%s,%s, %s, %s,%s, %s,%s,%s,%s, %s, %s,%s, %s);"""
     conn = None
     vendor_id = None
     try:
@@ -54,7 +64,7 @@ def insert(website,crdate,kode_rs,rumah_sakit,tgl_registrasi,jenis,kls_rs,direkt
         # create a new cursor
         cur = conn.cursor()
         # execute the INSERT statement
-        cur.execute(sql, (crdate, kode_rs,rumah_sakit,tgl_registrasi,jenis,kls_rs,direktur_rs,latar_belakang_pendidikan))
+        cur.execute(sql, (crdate, kode_rs,rumah_sakit,tgl_registrasi,jenis,kls_rs,direktur_rs,latar_belakang_pendidikan,pemilik,alamat,kode_pos,telepon,fax,email,telepon_humas,website,status_akreditasi))
         # get the generated id back
         #vendor_id = cur.fetchone()[0]
         vendor_id = cur.lastrowid
@@ -64,18 +74,18 @@ def insert(website,crdate,kode_rs,rumah_sakit,tgl_registrasi,jenis,kls_rs,direkt
         cur.close()
     except (Exception, mysqldb.DatabaseError) as error:
         print(error)
+        print('insert error')
     finally:
         if conn is not None:
             conn.close()
- 
     return vendor_id
 
-def update(id,website,crdate,kode_rs,rumah_sakit,tgl_registrasi,jenis,kls_rs,direktur_rs,latar_belakang_pendidikan):
+def update(id,url,crdate,kode_rs,rumah_sakit,tgl_registrasi,jenis,kls_rs,direktur_rs,latar_belakang_pendidikan,pemilik,alamat,kode_pos,telepon,fax,email,telepon_humas,website,status_akreditasi):
     mysqldb = mysql.connector
     """ Insert with cek if exists"""
     sql = """ 
     UPDATE kemkes_profile 
-    SET crawl_date=%s, kode_rs=%s,rumah_sakit=%s,tgl_registrasi=%s,jenis=%s,kls_rs=%s,direktur_rs=%s,latar_belakang_pendidikan=%s
+    SET crawl_date=%s, kode_rs=%s,rumah_sakit=%s,tgl_registrasi=%s,jenis=%s,kls_rs=%s,direktur_rs=%s,latar_belakang_pendidikan=%s,pemilik=%s,alamat=%s,kode_pos=%s,telepon=%s,fax=%s,email=%s,telepon_humas=%s,website=%s,status_akreditasi=%s
     WHERE id=%s
     ;"""
     conn = None
@@ -88,7 +98,7 @@ def update(id,website,crdate,kode_rs,rumah_sakit,tgl_registrasi,jenis,kls_rs,dir
         # create a new cursor
         cur = conn.cursor()
         # execute the INSERT statement
-        cur.execute(sql, (crdate,kode_rs,rumah_sakit,tgl_registrasi,jenis,kls_rs,direktur_rs,latar_belakang_pendidikan))
+        cur.execute(sql, (crdate,kode_rs,rumah_sakit,tgl_registrasi,jenis,kls_rs,direktur_rs,latar_belakang_pendidikan,pemilik,alamat,kode_pos,telepon,fax,email,telepon_humas,website,status_akreditasi,id))
         # get the generated id back
         #vendor_id = cur.fetchone()[0]
         vendor_id = cur.lastrowid
@@ -98,10 +108,10 @@ def update(id,website,crdate,kode_rs,rumah_sakit,tgl_registrasi,jenis,kls_rs,dir
         cur.close()
     except (Exception, mysqldb.DatabaseError) as error:
         print(error)
+        print('update error')
     finally:
         if conn is not None:
             conn.close()
- 
     return vendor_id
 
 def get_one(name):
@@ -113,7 +123,7 @@ def get_one(name):
         params = config()
         conn = mysqldb.connect(**params)
         cur = conn.cursor()
-        sql = "SELECT id FROM kemkes_profile WHERE rumah_sakit = %s limit 1"
+        sql = "SELECT id FROM kemkes_profile WHERE kode_rs = %s limit 1"
         cur.execute(sql,(name,))
         rowid = cur.fetchone()
         if rowid :
@@ -121,6 +131,7 @@ def get_one(name):
         cur.close()
     except (Exception, mysqldb.DatabaseError) as error:
         print(error)
+        print('get error')
     finally:
         if conn is not None:
             conn.close()

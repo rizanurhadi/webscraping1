@@ -18,7 +18,7 @@ def readcsvandupdate(website,filecsv):
         for row in reader :
             rowid = get_one(row[1])
             if rowid :
-                rowid = update(rowid,website,timestr,row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11])
+                update(rowid,website,timestr,row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11])
             else :
                 rowid = insert(website,timestr,row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11])
     os.remove(filecsv)
@@ -149,7 +149,7 @@ def connect():
         # connect to the PostgreSQL server
         print('Connecting to the Mysql database...')
         conn = mysqldb.connect(**params)
-      
+
         # create a cursor
         cur = conn.cursor()
         
