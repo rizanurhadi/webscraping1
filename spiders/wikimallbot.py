@@ -7,7 +7,7 @@ from sys import exit
 import os 
 import logging 
 from scrapy import signals
-import wikimallbottodbmy
+from . import wikimallbottodbmy
 import re
 #from scrapy.utils.log import configure_logging  
 

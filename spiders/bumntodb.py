@@ -2,7 +2,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import psycopg2
-from configdb import config
+from .configdb import config
 import csv
 import time
 

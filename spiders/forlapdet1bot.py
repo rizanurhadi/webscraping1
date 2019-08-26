@@ -5,8 +5,8 @@ import csv
 import time
 import os
 from scrapy import signals
-import forlapdetproftodbmy
-import forlapdetprgsttodbmy
+from . import forlapdetproftodbmy
+from . import forlapdetprgsttodbmy
 
 
 class Forlapdet1botSpider(scrapy.Spider):
@@ -44,8 +44,8 @@ class Forlapdet1botSpider(scrapy.Spider):
             for row in datareader:
                 iterasi += 1
                 yield scrapy.Request(row[2], self.parse_profile, meta={'iterasi':iterasi,'kode':row[0]})
-                if iterasi == 5 :
-                    exit(0)
+                #if iterasi == 5 :
+                #    exit(0)
 
     def parse(self, response):
         """

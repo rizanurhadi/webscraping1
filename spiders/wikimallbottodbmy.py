@@ -2,7 +2,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import mysql.connector
-from configdbmy import config
+from .configdbmy import config
 import csv
 import time
 import os

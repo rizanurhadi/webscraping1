@@ -8,7 +8,7 @@ from sys import exit
 #import logging 
 #from scrapy.utils.log import configure_logging  
 from scrapy import signals
-import kemkesdetbottodbmy
+from . import kemkesdetbottodbmy
 
 
 class KemkesdetbotSpider(scrapy.Spider):

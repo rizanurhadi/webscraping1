@@ -6,7 +6,7 @@ import csv
 from sys import exit
 import os
 from scrapy import signals
-import kemendagbottodbmy
+from . import kemendagbottodbmy
 
 
 class KemendagbotSpider(scrapy.Spider):

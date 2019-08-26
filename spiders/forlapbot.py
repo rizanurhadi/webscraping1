@@ -8,7 +8,7 @@ from selenium.webdriver.chrome.options import Options
 #from scrapy.selector import Selector
 import os
 from scrapy import signals
-import forlapbottodbmy
+from . import forlapbottodbmy
 
 
 class ForlapbotSpider(scrapy.Spider):
@@ -38,7 +38,7 @@ class ForlapbotSpider(scrapy.Spider):
 
 
     def __init__(self):
-        self.driver = webdriver.Chrome(executable_path='D:/scrapy_script/chromedriver_win32/chromedriver.exe')
+        self.driver = webdriver.Chrome(executable_path='E:/pyproject/chromedriver.exe', chrome_options=self.options)
         #self.driver = webdriver.Chrome('/usr/bin/chromedriver', chrome_options=self.options, service_args=['--verbose', '--log-path=/root/crawling/chromedriver.log'])
 
     def parse(self, response):

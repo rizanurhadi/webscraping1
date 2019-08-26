@@ -7,7 +7,7 @@ import csv
 import os
 import re
 from scrapy import signals
-import bumntodbmy
+from . import bumntodbmy
 #import psycopg2
 #from configdb import config
 

@@ -9,7 +9,7 @@ import logging
 from selenium.webdriver.chrome.options import Options
 #from scrapy.utils.log import configure_logging  
 from scrapy import signals
-import kemkesbottodbmy
+from . import kemkesbottodbmy
 
 class KemsesbotSpider(scrapy.Spider):
     dir_path = os.path.dirname(os.path.realpath(__file__))

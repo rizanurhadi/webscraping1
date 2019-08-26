@@ -2,12 +2,15 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import mysql.connector
-from configdbmy import config
+from .configdbmy import config
 import csv
 import time
 import os
 
 def readcsvandupdate(website,filecsv):
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    filecsv = dir_path + '/../out/forlap_pt_header_20190821-154557.csv'
+    
     print("reading file from %s", filecsv)
     timestr = time.strftime("%Y-%m-%d %H:%M:%S")
     #fieldnames = ['kode','nama', 'link_detail', 'prov','kategori','status','jml_dosen_tetap_1718', 'jml_mhs_1718' , 'rasio_dosen_mhs_1718', 'jml_dosen_tetap_1819', 'jml_mhs_1819' , 'rasio_dosen_mhs_1819']
@@ -16,7 +19,7 @@ def readcsvandupdate(website,filecsv):
         reader = csv.reader(f, dialect='myDialect')
         next(reader)
         for row in reader :
-            rowid = get_one(row[1])
+            rowid = get_one(row[0])
             if rowid :
                 update(rowid,website,timestr,row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11])
             else :
@@ -103,7 +106,7 @@ def update(id,website,crdate,kode,nama, link_detail, prov,kategori,status,jml_do
         conn.commit()
         # close communication with the database
         cur.close()
-        print('update suskes')
+        print('update suskes' + kode)
     except (Exception, mysqldb.DatabaseError) as error:
         print(error)
         print('update error')
@@ -122,7 +125,7 @@ def get_one(name):
         params = config()
         conn = mysqldb.connect(**params)
         cur = conn.cursor()
-        sql = "SELECT id FROM forlap_header WHERE nama = %s LIMIT 1"
+        sql = "SELECT id FROM forlap_header WHERE kode = %s LIMIT 1"
         cur.execute(sql,(name,))
         #print("The number of parts: ", cur.rowcount)
         rowid = cur.fetchone()
@@ -169,3 +172,6 @@ def connect():
         if conn is not None:
             conn.close()
             print('Database connection closed.')
+
+if __name__ == '__main__':
+    readcsvandupdate('forlap','test')
