@@ -4,6 +4,7 @@ import scrapy
 import csv
 import time
 import os
+import re
 from scrapy import signals
 from . import forlapdetproftodbmy
 from . import forlapdetprgsttodbmy
@@ -17,6 +18,7 @@ class Forlapdet1botSpider(scrapy.Spider):
     timestr = time.strftime("%Y%m%d-%H%M%S")
     filename1 = dir_path + '/../out/forlap_pt_profile%s.csv' % timestr
     filename2 = dir_path + '/../out/forlap_perguruan_tinggi.csv'
+    #filename2 = dir_path + '/../out/forlap_pt_test.csv'
     filename3 = dir_path + '/../out/forlap_pt_program_st%s.csv' % timestr
     #profile
     fieldnames = ['kode','status_pt','tanggal_sk_pt','tanggal_berdiri','perguruan_tinggi','website','telepon','kode_pos','email','faximile','kota_kabupaten','alamat','nomor_sk_pt','jml_mhs_1718','jml_dosen_tetap_1718','rasio_dosen_mhs_1718','jml_mhs_1819','jml_dosen_tetap_1819','rasio_dosen_mhs_1819']
@@ -78,18 +80,18 @@ class Forlapdet1botSpider(scrapy.Spider):
             for row in response.css('table[class=table1] tr'):
                 data = row.css('td')
                 if data[2].css('::text').get() :
-                    myyield[data[0].css('::text').get().lower().replace(" ", "_").replace("/", "_")]= data[2].css('::text').get().replace('\n', ' ').replace('\r', ' ').strip()
+                    myyield[data[0].css('::text').get().lower().replace(" ", "_").replace("/", "_")]= re.sub(r'[^\x00-\x7F]+','',data[2].css('::text').get().replace('\n', ' ').replace('\r', ' ').strip())
                 else :
                     myyield[data[0].css('::text').get().lower().replace(" ", "_").replace("/", "_")]= ''
             
             for alltr in mytable[0].css('tr.ttop') :
                 datatd = alltr.css('td')
-                myyield['jml_dosen_tetap_1718'] = datatd[0].css('::text').get()
-                myyield['jml_mhs_1718'] = datatd[1].css('::text').get()
-                myyield['rasio_dosen_mhs_1718'] = datatd[2].css('::text').get()
-                myyield['jml_dosen_tetap_1819'] = datatd[3].css('::text').get()
-                myyield['jml_mhs_1819'] = datatd[4].css('::text').get()
-                myyield['rasio_dosen_mhs_1819'] = datatd[5].css('::text').get()
+                myyield['jml_dosen_tetap_1718'] = re.sub(r'[^\x00-\x7F]+','', datatd[0].css('::text').get())
+                myyield['jml_mhs_1718'] = re.sub(r'[^\x00-\x7F]+','',datatd[1].css('::text').get())
+                myyield['rasio_dosen_mhs_1718'] = re.sub(r'[^\x00-\x7F]+','',datatd[2].css('::text').get())
+                myyield['jml_dosen_tetap_1819'] = re.sub(r'[^\x00-\x7F]+','',datatd[3].css('::text').get())
+                myyield['jml_mhs_1819'] = re.sub(r'[^\x00-\x7F]+','',datatd[4].css('::text').get())
+                myyield['rasio_dosen_mhs_1819'] = re.sub(r'[^\x00-\x7F]+','',datatd[5].css('::text').get())
 
             w = csv.DictWriter(f, self.fieldnames, lineterminator='\n', delimiter='|')
             if response.meta.get('iterasi') ==2 : 
@@ -102,16 +104,16 @@ class Forlapdet1botSpider(scrapy.Spider):
                 myitr +=1
                 if myitr > 2 :
                     datatd2 = alltr.css('td')
-                    myprstudi['kode'] =datatd2[1].css('::text').get().strip()
-                    myprstudi['nama'] =datatd2[2].css('::text').get().strip()
-                    myprstudi['status'] =datatd2[3].css('::text').get().strip()
-                    myprstudi['jenjang'] =datatd2[4].css('::text').get().strip()
-                    myprstudi['jml_dosen_tetap_1718'] =datatd2[5].css('::text').get().strip()
-                    myprstudi['jml_mhs_1718'] =datatd2[6].css('::text').get().strip()
-                    myprstudi['rasio_dosen_mhs_1718'] =datatd2[7].css('::text').get().strip()
-                    myprstudi['jml_dosen_tetap_1819'] =datatd2[8].css('::text').get().strip()
-                    myprstudi['jml_mhs_1819'] =datatd2[9].css('::text').get().strip()
-                    myprstudi['rasio_dosen_mhs_1819'] =datatd2[10].css('::text').get().strip()
+                    myprstudi['kode'] =re.sub(r'[^\x00-\x7F]+','',datatd2[1].css('::text').get().strip())
+                    myprstudi['nama'] =re.sub(r'[^\x00-\x7F]+','',datatd2[2].css('::text').get().strip())
+                    myprstudi['status'] =re.sub(r'[^\x00-\x7F]+','',datatd2[3].css('::text').get().strip())
+                    myprstudi['jenjang'] =re.sub(r'[^\x00-\x7F]+','',datatd2[4].css('::text').get().strip())
+                    myprstudi['jml_dosen_tetap_1718'] =re.sub(r'[^\x00-\x7F]+','',datatd2[5].css('::text').get().strip())
+                    myprstudi['jml_mhs_1718'] =re.sub(r'[^\x00-\x7F]+','',datatd2[6].css('::text').get().strip())
+                    myprstudi['rasio_dosen_mhs_1718'] =re.sub(r'[^\x00-\x7F]+','',datatd2[7].css('::text').get().strip())
+                    myprstudi['jml_dosen_tetap_1819'] =re.sub(r'[^\x00-\x7F]+','',datatd2[8].css('::text').get().strip())
+                    myprstudi['jml_mhs_1819'] =re.sub(r'[^\x00-\x7F]+','',datatd2[9].css('::text').get().strip())
+                    myprstudi['rasio_dosen_mhs_1819'] =re.sub(r'[^\x00-\x7F]+','',datatd2[10].css('::text').get().strip())
                     w2 = csv.DictWriter(f2, self.fieldnames2, lineterminator='\n', delimiter='|')
                     if myitr ==3 : 
                         w2.writeheader()

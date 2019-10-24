@@ -34,11 +34,13 @@ class ForlapbotSpider(scrapy.Spider):
     def spider_closed(self, spider):
         spider.logger.info('Signal sent then Spider closed. file out is : %s', self.filename1)
         #save to db here
-        forlapbottodbmy.readcsvandupdate(self.allowed_domains[0],self.filename1)
+        #forlapbottodbmy.readcsvandupdate(self.allowed_domains[0],self.filename1)
 
 
     def __init__(self):
-        self.driver = webdriver.Chrome(executable_path='E:/pyproject/chromedriver.exe', chrome_options=self.options)
+        self.driver = webdriver.Chrome(executable_path='E:/pyproject/chromedriver.exe')
+        #refs = {"profile.managed_default_content_settings.images": 2}
+        #self.options.add_experimental_option("prefs", prefs)
         #self.driver = webdriver.Chrome('/usr/bin/chromedriver', chrome_options=self.options, service_args=['--verbose', '--log-path=/root/crawling/chromedriver.log'])
 
     def parse(self, response):
@@ -70,8 +72,8 @@ class ForlapbotSpider(scrapy.Spider):
             gotroughpage = True
             if gotroughpage == True :
                 while True:
-                    mylia = self.driver.find_element_by_xpath('//li[@class="active"]/following-sibling::li/a')
                     try:
+                        mylia = self.driver.find_element_by_xpath('//li[@class="active"]/following-sibling::li/a')
                         mylia.click()
                         time.sleep(2.5)
                         # get the data and write it to scrapy items
@@ -85,8 +87,9 @@ class ForlapbotSpider(scrapy.Spider):
                             #if iterasi ==2 : 
                             #    w.writeheader()
                             w.writerow(myyield)
-                            self.write_secondfile(myyield,iterasi)
-                    except:
+                            yield self.write_secondfile(myyield,iterasi)
+                    except Exception as e:
+                        print(e)
                         break
             time.sleep(2)
             self.driver.quit()

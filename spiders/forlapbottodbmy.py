@@ -9,7 +9,7 @@ import os
 
 def readcsvandupdate(website,filecsv):
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    filecsv = dir_path + '/../out/forlap_pt_header_20190821-154557.csv'
+    #filecsv = dir_path + '/../out/forlap_pt_header_20190821-154557.csv'
     
     print("reading file from %s", filecsv)
     timestr = time.strftime("%Y-%m-%d %H:%M:%S")

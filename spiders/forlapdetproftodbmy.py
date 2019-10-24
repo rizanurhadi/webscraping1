@@ -33,7 +33,7 @@ def insert(url,crdate,kode,status_pt,tanggal_sk_pt,tanggal_berdiri,perguruan_tin
         status_pt varchar(50)  null, 
         tanggal_sk_pt varchar(50)  null, 
         tanggal_berdiri varchar(50)  null, 
-        perguruan_tinggi varchar(50)  null, 
+        perguruan_tinggi varchar(200)  null, 
         website varchar(200)  null, 
         telepon varchar(50)  null, 
         kode_pos varchar(20)  null, 

@@ -62,54 +62,55 @@ class KemkesdetbotSpider(scrapy.Spider):
                     for row in response.css('table[id=fields_block1] tr'):
                         data = row.css('td')
                         if i>=1 and i <9 :
-                            myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")] = data[1].css('::text').get().encode('utf-8').strip().replace("\n", "").replace('\r', ' ')
+                            myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")] = data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
                         if i>=10 and i <18 :
-                            myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_").replace("/", "_")]= data[1].css('::text').get().encode('utf-8').strip().replace("\n", "").replace('\r', ' ')
+                            myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_").replace("/", "_")]= data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
                         if i>=19 and i <27 :
-                            myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().encode('utf-8').strip().replace("\n", "").replace('\r', ' ')
+                            myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
                         if i>=28 and i <31 :
-                            myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().encode('utf-8').strip().replace("\n", "").replace('\r', ' ')
-                        if i >= 32 and i < 46 :
-                            myyield['tempat_tidur_' + data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().encode('utf-8').strip().replace("\n", "").replace('\r', ' ')
-                        #Dokter
+                            myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                        """ if i >= 32 and i < 46 :
+                            myyield['tempat_tidur_' + data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                         #Dokter
                         if i >= 48 and i < 63 :
-                            myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().encode('utf-8').strip().replace("\n", "").replace('\r', ' ')
-                            myyield[data[2].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[3].css('::text').get().encode('utf-8').strip().replace("\n", "").replace('\r', ' ')
+                            myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                            myyield[data[2].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[3].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
                         #DokterGIgi
                         if i >= 64 and i < 69 :
-                            myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().encode('utf-8').strip().replace("\n", "").replace('\r', ' ')
-                            myyield[data[2].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[3].css('::text').get().encode('utf-8').strip().replace("\n", "").replace('\r', ' ')
+                            myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                            myyield[data[2].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[3].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
                         #perawat
                         if i >= 70 and i < 74 :
-                            myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().encode('utf-8').strip().replace("\n", "").replace('\r', ' ')
-                            myyield[data[2].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[3].css('::text').get().encode('utf-8').strip().replace("\n", "").replace('\r', ' ')
+                            myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                            myyield[data[2].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[3].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
                         #bidan
                         if i >= 75 and i < 77 :
-                            myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().encode('utf-8').strip().replace("\n", "").replace('\r', ' ')
-                            myyield[data[2].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[3].css('::text').get().encode('utf-8').strip().replace("\n", "").replace('\r', ' ')
+                            myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                            myyield[data[2].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[3].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
                         #Keteknisian Medis
                         if i >= 78 and i < 88 :
-                            myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().encode('utf-8').strip().replace("\n", "").replace('\r', ' ')
+                            myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
                         if i >= 78 and i < 87 :
-                            myyield[data[2].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[3].css('::text').get().encode('utf-8').strip().replace("\n", "").replace('\r', ' ')
+                            myyield[data[2].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[3].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
                         #Tenaga Kesehatan Lainnya
                         if i >= 89 and i < 94 :
-                            myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().encode('utf-8').strip().replace("\n", "").replace('\r', ' ')
-                            myyield[data[2].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[3].css('::text').get().encode('utf-8').strip().replace("\n", "").replace('\r', ' ')
+                            myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                            myyield[data[2].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[3].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
                         #Tenaga Non Kesehatan
                         if i >= 95 and i < 102 :
-                            myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().encode('utf-8').strip().replace("\n", "").replace('\r', ' ')
-                            myyield[data[2].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[3].css('::text').get().encode('utf-8').strip().replace("\n", "").replace('\r', ' ')
+                            myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                            myyield[data[2].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[3].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
                         #Tenaga Non Kesehatan
                         if i >= 103 and i < 116 :
-                            myyield['alatrs_'+ data[0].css('::text').get().split(':', 1)[0].strip().replace("\n", "").replace('\r', ' ').replace(" ", "_")]= data[0].css('::text').get().encode('utf-8').split(':')[1].strip().replace("\n", "").replace('\r', ' ')
+                            myyield['alatrs_'+ data[0].css('::text').get().split(':', 1)[0].strip().replace("\n", "").replace('\r', ' ').replace(" ", "_")]= data[0].css('::text').get().split(':')[1].strip().replace("\n", "").replace('\r', ' ')
                             #yield { 'test' : 'alatrs_'+ data[0].css('::text').get().split(':', 1)[0].strip().replace("\n", "").replace('\r', ' ').replace(" ", "_") + '= scrapy.Field()' }
                         if i >= 103 and i < 111 :
-                            myyield['indikator_thn_sblm_'+ data[1].css('::text').get().split(':', 1)[0].strip().replace("\n", "").replace('\r', ' ').replace(" ", "_")]= data[1].css('::text').get().encode('utf-8').split(':')[1].strip().replace("\n", "").replace('\r', ' ')
+                            myyield['indikator_thn_sblm_'+ data[1].css('::text').get().split(':', 1)[0].strip().replace("\n", "").replace('\r', ' ').replace(" ", "_")]= data[1].css('::text').get().split(':')[1].strip().replace("\n", "").replace('\r', ' ')
                             #yield { 'test' : 'indikator_thn_sblm_'+ data[1].css('::text').get().split(':', 1)[0].strip().replace("\n", "").replace('\r', ' ').replace(" ", "_") + '= scrapy.Field()' }
                         if i >= 103 and i < 107 :
-                            myyield['lainya_'+ data[2].css('::text').get().split(':', 1)[0].strip().replace("\n", "").replace('\r', ' ').replace(" ", "_")]= data[2].css('::text').get().encode('utf-8').split(':')[1].strip().replace("\n", "").replace('\r', ' ')
+                            myyield['lainya_'+ data[2].css('::text').get().split(':', 1)[0].strip().replace("\n", "").replace('\r', ' ').replace(" ", "_")]= data[2].css('::text').get().split(':')[1].strip().replace("\n", "").replace('\r', ' ')
                             #yield { 'test' : 'lainya_'+ data[2].css('::text').get().split(':', 1)[0].strip().replace("\n", "").replace('\r', ' ').replace(" ", "_") + '= scrapy.Field()' }
+                            #  """
                         i += 1 
                         
                     #yield myyield
@@ -125,5 +126,5 @@ class KemkesdetbotSpider(scrapy.Spider):
                 page = response.meta.get('page', 0) + 1
                 #time.sleep(2)
                 next_page = 'http://sirs.yankes.kemkes.go.id/rsonline/data_view.php?editid1=' + str(page)
-                exit(0) if page == 5 else None
+                #exit(0) if page == 5 else None
                 yield scrapy.Request(next_page, callback=self.parse, meta={'iterasi':iterasi,'page': page })

@@ -23,7 +23,7 @@ def readcsvandupdate(url,filecsv):
                 rowid = insert(url,timestr,row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11],row[12],row[13],row[14],row[15])
             print("saved data %s with id %s", (rowid,row[1]))
         #print("save file one by one")
-    os.remove(filecsv)
+    #os.remove(filecsv)
 
 def insert(url,crdate,kode_rs,rumah_sakit,tgl_registrasi,jenis,kls_rs,direktur_rs,latar_belakang_pendidikan,pemilik,alamat,kode_pos,telepon,fax,email,telepon_humas,website,status_akreditasi):
     mysqldb = mysql.connector

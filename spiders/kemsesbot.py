@@ -27,7 +27,7 @@ class KemsesbotSpider(scrapy.Spider):
     name = 'kemsesbot'
     allowed_domains = ['sirs.yankes.kemkes.go.id']
     start_urls = ['http://sirs.yankes.kemkes.go.id/rsonline/DATA_RUMAH_SAKIT_REPORT_report.php?pagesize=-1/']
-    fieldnames = ['kode','nama','tgl_registrasi','jenis','kelas','direktur','alamat','penyelenggara','kab_kota','kodepos','telephone','fax','tgl_update','produk']
+    fieldnames = ['kode','nama','tgl_registrasi','jenis','kelas','direktur','alamat','penyelenggara','kab_kota','kodepos','telephone','fax','tgl_update','email']
     filename1 = dir_path + '/../out/kemkesbot_%s.csv' % timestr
 
     @classmethod
