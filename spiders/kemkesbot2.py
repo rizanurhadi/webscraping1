@@ -11,6 +11,7 @@ from selenium.webdriver.chrome.options import Options
 from scrapy import signals
 from . import kemkesbottodbmy
 from . import kemkesdetbottodbmy
+from . import kemkesdetmoretodbmy
 
 
 class Kemkesbot2Spider(scrapy.Spider):
@@ -19,11 +20,15 @@ class Kemkesbot2Spider(scrapy.Spider):
     allowed_domains = ['sirs.yankes.kemkes.go.id']
     start_urls = ['http://sirs.yankes.kemkes.go.id/rsonline/data_list.php']
     fieldnames = ['kode','nama','tgl_registrasi','jenis','kelas','direktur','pemilik','alamat','penyelenggara','kab_kota','kodepos','telephone','fax','tgl_update','email']
+    fieldnames3 = ['kode_rs','nama_field','nilai_field']
     timestr = time.strftime("%Y%m%d-%H%M%S")
     filename1 = dir_path + '/../out/kemkesbot_%s.csv' % timestr
     filename2 = dir_path + '/../out/kemses_detail_%s.csv' % timestr
+    filename3 = dir_path + '/../out/kemses_detail_more_%s.csv' % timestr
     fieldnames2 = ['kode_rs','rumah_sakit','tgl_registrasi','jenis','kls_rs','direktur_rs','latar_belakang_pendidikan','pemilik','alamat','kode_pos','telepon','fax','email','telepon_humas','website','status_akreditasi']
     fieldnames2.extend([ 'luas_tanah', 'berlaku_sampai_dengan', 'kab_kota', 'tgl_akreditas', 'tanggal_surat_ijin', 'surat_ijin_dari', 'no_surat_ijin', 'sifat_surat_ijin', 'status_penyelenggara', 'luas_bangunan', 'update', 'masa_berlaku_surat_ijin'])
+    #fieldnames2.extend(['tempat_tidur_kelas_i', 'tempat_tidur_vip', 'tempat_tidur_tt_bayi_baru_lahir', 'tempat_tidur_vvip', 'tempat_tidur_picu', 'tempat_tidur_hcu', 'tempat_tidur_igd', 'tempat_tidur_icu', 'tempat_tidur_tt_di_ruang_isolasi', 'tempat_tidur_iccu', 'tempat_tidur_kelas_ii', 'tempat_tidur_tt_di_ruang_operasi', 'tempat_tidur_kelas_iii', 'tempat_tidur_nicu'])
+    #fieldnames2.extend(['dokter_sp_rad', 'dokter_sp_tht', 'dokter_sp_kes__jiwa', 'dokter_sp_a', 'dokter_sp_pd', 'dokter_sp_ofthalmologi', 'dokter_sp_patologi_anatomi', 'dokter_sp_an', 'dokter_sp_rm', 'dokter_sp_bedah_saraf', 'dokter_sp_og', 'dokter_sp_bedah_plastik', 'dr_umum', 'dokter_sp_forensik', 'dokter_sp_kulit_dan_kelamin', 'dokter_sp_pk', 'dokter_sp_b', 'dokter_sp_bedah_anak', 'dokter_sp_saraf', 'dokter_sp_jp', 'dokter_sp_lainnya', 'dokter_sp_bedah_thoraks', 'dokter_sp_m', 'dokter_sp_bedah_orthopedi', 'dokter_sp_orthopedi', 'dokter_sp_paru', 'dokter_sp_urologi', 'dokter_sub_spesialis', 'dokter_sp_okupasi', 'dokter_sp_psikiatri'])
     #,'bidan_pendidik','dokter_gigi_sp_gigi_tiruan','pekarya','alatrs_Meja_Operasi','dokter_sp_bedah_plastik','kesja','analis_farmasi','tempat_tidur_tt_di_ruang_isolasi','humas','perawat_maternitas','alatrs_CT_Scan','berlaku_sampai_dengan','rumah_sakit','entomologi','dietisien','biostatistik','informasi_kesehatan','dokter_sp_lainnya','widyaiswara','luas_bangunan','akupunturis','sanitasi','tempat_tidur_igd','alatrs_E_E_G','tempat_tidur_hcu','jenis','dokter_sub_spesialis','fisioterapi','lainya_SIMRS','administrasi_keuangan'
     #,'dokter_sp_bedah_orthopedi','indikator_thn_sblm_T_O_I','status_penyelenggara','dokter_gigi_sp_periodonsia','tempat_tidur_nicu','dokter_sp_psikiatri','dokter_sp_bedah_saraf','dokter_sp_orthopedi','dokter_gigi_sp_konservasi','tanggal_surat_ijin','dokter_sp_og','kode_rs','perawat_komunitas','alatrs_E_K_G','tempat_tidur_vip','dokter_gigi_sp_radiologi','informasi_teknologi','surat_ijin_dari','sifat_surat_ijin','alatrs_Defibrilator','indikator_thn_sblm_N_D_R','no_surat_ijin','kesehatan_lingkungan','dokter_sp_tht','kab_kota','tempat_tidur_kelas_iii'
     #,'dokter_sp_jp','perawat_bedah','alatrs_Inkubator','dokter_gigi_sp_bedah_mulut','dokter_sp_paru','nutrisionis','rekam_medik','epidemiologi','dokter_sp_patologi_anatomi','latar_belakang_pendidikan','indikator_thn_sblm_Rawat_Jalan','dokter_sp_saraf','refraksionis','dokter_sp_rm','analis_kesehatan','dokter_sp_bedah_anak','dokter_sp_ofthalmologi','teknisi_gigi','apoteker','radiografer','dokter_sp_a','dokter_sp_forensik','dokter_gigi_sp_karang_gigi','tempat_tidur_iccu','dokter_gigi_sp_penyakit_mulut','dokter_sp_m','tempat_tidur_kelas_ii','terapi_wicara'
@@ -43,6 +48,7 @@ class Kemkesbot2Spider(scrapy.Spider):
         #save to db here
         kemkesbottodbmy.readcsvandupdate(self.allowed_domains[0],self.filename1)
         kemkesdetbottodbmy.readcsvandupdate(self.allowed_domains[0],self.filename2)
+        kemkesdetmoretodbmy.readcsvandupdate(self.allowed_domains[0],self.filename3)
 
     def parse(self, response):
         total = response.xpath('//span[@id="detFound1"]/text()').get().split(" ")[2]
@@ -60,6 +66,11 @@ class Kemkesbot2Spider(scrapy.Spider):
             myfield = row.css('td')
             link_detail = 'http://sirs.yankes.kemkes.go.id/rsonline/' +  myfield[0].css('a::attr(href)').get()
             yield scrapy.Request(link_detail, self.parse_detail,meta={})
+            """ if iterasi == 5 :
+                exit(0)
+                break """
+                #self.close(self)
+                
             kode = '' 
             if myfield[1].css('p span::text').get() :
                 kode = myfield[1].css('p span::text').get().strip()
@@ -124,12 +135,17 @@ class Kemkesbot2Spider(scrapy.Spider):
                     w.writeheader()
                 w.writerow(myyield)
             iterasi += 1
+            
 
     def parse_detail(self, response) :
         i=0
         myyield = {
                 'update':''
             }
+        myyield2 = {
+            'nama_field':'',
+            'nilai_field':''
+        }
         if response.css('table[id=fields_block1] tr td::text') :
             for row in response.css('table[id=fields_block1] tr'):
                 data = row.css('td')
@@ -141,6 +157,159 @@ class Kemkesbot2Spider(scrapy.Spider):
                     myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
                 if i>=28 and i <31 :
                     myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                #tempattidur 14 field
+                #myyield2['kode_rs'] = myyield['kode_rs']
+                if i >= 32 and i < 46 :
+                    #myyield['tempat_tidur_' + data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    myyield2['kode_rs'] = myyield['kode_rs']
+                    myyield2['nama_field'] = 'tempat tidur ' + data[0].css('::text').get()
+                    myyield2['nilai_field'] = data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    with open(self.filename3, 'a') as f:
+                        w = csv.DictWriter(f, self.fieldnames3, lineterminator='\n', delimiter='|')
+                        w.writerow(myyield2)
+                #Dokter 30 field
+                if i >= 48 and i < 63 :
+                    #myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    #myyield[data[2].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[3].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    myyield2['kode_rs'] = myyield['kode_rs']
+                    myyield2['nama_field'] = data[0].css('::text').get()
+                    myyield2['nilai_field'] = data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    with open(self.filename3, 'a') as f:
+                        w = csv.DictWriter(f, self.fieldnames3, lineterminator='\n', delimiter='|')
+                        w.writerow(myyield2)
+                    myyield2['kode_rs'] = myyield['kode_rs']
+                    myyield2['nama_field'] = data[2].css('::text').get()
+                    myyield2['nilai_field'] = data[3].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    with open(self.filename3, 'a') as f:
+                        w = csv.DictWriter(f, self.fieldnames3, lineterminator='\n', delimiter='|')
+                        w.writerow(myyield2)
+                    #DokterGIgi
+                if i >= 64 and i < 69 :
+                    #myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    myyield2['kode_rs'] = myyield['kode_rs']
+                    myyield2['nama_field'] = data[0].css('::text').get()
+                    myyield2['nilai_field'] = data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    with open(self.filename3, 'a') as f:
+                        w = csv.DictWriter(f, self.fieldnames3, lineterminator='\n', delimiter='|')
+                        w.writerow(myyield2)
+                    #myyield[data[2].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[3].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    myyield2['kode_rs'] = myyield['kode_rs']
+                    myyield2['nama_field'] = data[2].css('::text').get()
+                    myyield2['nilai_field'] = data[3].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    with open(self.filename3, 'a') as f:
+                        w = csv.DictWriter(f, self.fieldnames3, lineterminator='\n', delimiter='|')
+                        w.writerow(myyield2)
+                #perawat
+                if i >= 70 and i < 74 :
+                    #myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    myyield2['kode_rs'] = myyield['kode_rs']
+                    myyield2['nama_field'] = data[0].css('::text').get()
+                    myyield2['nilai_field'] = data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    with open(self.filename3, 'a') as f:
+                        w = csv.DictWriter(f, self.fieldnames3, lineterminator='\n', delimiter='|')
+                        w.writerow(myyield2)
+                    #myyield[data[2].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[3].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    myyield2['kode_rs'] = myyield['kode_rs']
+                    myyield2['nama_field'] = data[2].css('::text').get()
+                    myyield2['nilai_field'] = data[3].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    with open(self.filename3, 'a') as f:
+                        w = csv.DictWriter(f, self.fieldnames3, lineterminator='\n', delimiter='|')
+                        w.writerow(myyield2)
+                #bidan
+                if i >= 75 and i < 77 :
+                    #myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    myyield2['kode_rs'] = myyield['kode_rs']
+                    myyield2['nama_field'] = data[0].css('::text').get()
+                    myyield2['nilai_field'] = data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    with open(self.filename3, 'a') as f:
+                        w = csv.DictWriter(f, self.fieldnames3, lineterminator='\n', delimiter='|')
+                        w.writerow(myyield2)
+                    #Farmasi
+                    #myyield[data[2].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[3].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    myyield2['kode_rs'] = myyield['kode_rs']
+                    myyield2['nama_field'] = data[2].css('::text').get()
+                    myyield2['nilai_field'] = data[3].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    with open(self.filename3, 'a') as f:
+                        w = csv.DictWriter(f, self.fieldnames3, lineterminator='\n', delimiter='|')
+                        w.writerow(myyield2)
+                #Keteknisian Medis
+                if i >= 78 and i < 88 :
+                    #myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    myyield2['kode_rs'] = myyield['kode_rs']
+                    myyield2['nama_field'] = data[0].css('::text').get()
+                    myyield2['nilai_field'] = data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    with open(self.filename3, 'a') as f:
+                        w = csv.DictWriter(f, self.fieldnames3, lineterminator='\n', delimiter='|')
+                        w.writerow(myyield2)
+                #Kesehatan Masyarakat
+                if i >= 78 and i < 87 :
+                    #myyield[data[2].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[3].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    myyield2['kode_rs'] = myyield['kode_rs']
+                    myyield2['nama_field'] = data[2].css('::text').get()
+                    myyield2['nilai_field'] = data[3].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    with open(self.filename3, 'a') as f:
+                        w = csv.DictWriter(f, self.fieldnames3, lineterminator='\n', delimiter='|')
+                        w.writerow(myyield2)
+                #Tenaga Kesehatan Lainnya
+                if i >= 89 and i < 94 :
+                    #myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    myyield2['kode_rs'] = myyield['kode_rs']
+                    myyield2['nama_field'] = data[0].css('::text').get()
+                    myyield2['nilai_field'] = data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    with open(self.filename3, 'a') as f:
+                        w = csv.DictWriter(f, self.fieldnames3, lineterminator='\n', delimiter='|')
+                        w.writerow(myyield2)
+                    #myyield[data[2].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[3].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    myyield2['kode_rs'] = myyield['kode_rs']
+                    myyield2['nama_field'] = data[2].css('::text').get()
+                    myyield2['nilai_field'] = data[3].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    with open(self.filename3, 'a') as f:
+                        w = csv.DictWriter(f, self.fieldnames3, lineterminator='\n', delimiter='|')
+                        w.writerow(myyield2)
+                #Tenaga Non Kesehatan
+                if i >= 95 and i < 102 :
+                    #myyield[data[0].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    myyield2['kode_rs'] = myyield['kode_rs']
+                    myyield2['nama_field'] = data[0].css('::text').get()
+                    myyield2['nilai_field'] = data[1].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    with open(self.filename3, 'a') as f:
+                        w = csv.DictWriter(f, self.fieldnames3, lineterminator='\n', delimiter='|')
+                        w.writerow(myyield2)
+                    #myyield[data[2].css('::text').get().lower().replace(" ", "_").replace(".", "_").replace("-", "_")]= data[3].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    myyield2['kode_rs'] = myyield['kode_rs']
+                    myyield2['nama_field'] = data[2].css('::text').get()
+                    myyield2['nilai_field'] = data[3].css('::text').get().strip().replace("\n", "").replace('\r', ' ')
+                    with open(self.filename3, 'a') as f:
+                        w = csv.DictWriter(f, self.fieldnames3, lineterminator='\n', delimiter='|')
+                        w.writerow(myyield2)
+                #Data Peralatan di Rumah Sakit
+                if i >= 103 and i < 116 :
+                    #myyield['alatrs_'+ data[0].css('::text').get().split(':', 1)[0].strip().replace("\n", "").replace('\r', ' ').replace(" ", "_")]= data[0].css('::text').get().split(':')[1].strip().replace("\n", "").replace('\r', ' ')
+                    myyield2['kode_rs'] = myyield['kode_rs']
+                    myyield2['nama_field'] = 'Alat RS : '+ data[0].css('::text').get().split(':', 1)[0].strip().replace("\n", "").replace('\r', ' ')
+                    myyield2['nilai_field'] = data[0].css('::text').get().split(':')[1].strip().replace("\n", "").replace('\r', ' ')
+                    with open(self.filename3, 'a') as f:
+                        w = csv.DictWriter(f, self.fieldnames3, lineterminator='\n', delimiter='|')
+                        w.writerow(myyield2)
+                    
+                if i >= 103 and i < 111 :
+                    #myyield['indikator_thn_sblm_'+ data[1].css('::text').get().split(':', 1)[0].strip().replace("\n", "").replace('\r', ' ').replace(" ", "_")]= data[1].css('::text').get().split(':')[1].strip().replace("\n", "").replace('\r', ' ')
+                    myyield2['kode_rs'] = myyield['kode_rs']
+                    myyield2['nama_field'] = 'Pelayanan RS Tahun sebelumnya : '+ data[1].css('::text').get().split(':', 1)[0].strip().replace("\n", "").replace('\r', ' ')
+                    myyield2['nilai_field'] = data[1].css('::text').get().split(':')[1].strip().replace("\n", "").replace('\r', ' ')
+                    with open(self.filename3, 'a') as f:
+                        w = csv.DictWriter(f, self.fieldnames3, lineterminator='\n', delimiter='|')
+                        w.writerow(myyield2)
+                    #yield { 'test' : 'indikator_thn_sblm_'+ data[1].css('::text').get().split(':', 1)[0].strip().replace("\n", "").replace('\r', ' ').replace(" ", "_") + '= scrapy.Field()' }
+                if i >= 103 and i < 107 :
+                    #myyield['lainya_'+ data[2].css('::text').get().split(':', 1)[0].strip().replace("\n", "").replace('\r', ' ').replace(" ", "_")]= data[2].css('::text').get().split(':')[1].strip().replace("\n", "").replace('\r', ' ')
+                    myyield2['kode_rs'] = myyield['kode_rs']
+                    myyield2['nama_field'] = 'Lainnya : '+ data[2].css('::text').get().split(':', 1)[0].strip().replace("\n", "").replace('\r', ' ')
+                    myyield2['nilai_field'] = data[2].css('::text').get().split(':')[1].strip().replace("\n", "").replace('\r', ' ')
+                    with open(self.filename3, 'a') as f:
+                        w = csv.DictWriter(f, self.fieldnames3, lineterminator='\n', delimiter='|')
+                        w.writerow(myyield2)
+                    #yield { 'test' : 'lainya_'+ data[2].css('::text').get().split(':', 1)[0].strip().replace("\n", "").replace('\r', ' ').replace(" ", "_") + '= scrapy.Field()' }
                 i += 1 
             #self.fieldnames2.extend(myyield.keys())
             with open(self.filename2, 'a') as f:
